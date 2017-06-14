@@ -16,15 +16,19 @@
         <!--Navbar-->
         <nav class="navbar navbar-inverse navbar-static-top">
           <ul class="nav navbar-nav navbar-left">
-            <li class="active"><a href="#">Home</a></li>
-            <li class="divider" style="padding-left:200px;"></li>
+            <li class="active"><a href="/index">Home</a></li>
+            <li class="divider" style="padding-left:200px"></li>
           </ul>
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Mood</a></li>
-            <li class="active"><a href="#">Body</a></li>
-            <li class="active"><a href="#">Diet</a></li>
-            <li class="active"><a href="#">Lifts</a></li>
-            <li class="active"><a href="#">Books</a></li>
+            <li class="active"><a href="/mood">Mood</a></li>
+            <li class="active"><a href="/body">Body</a></li>
+            <li class="active"><a href="/diet">Diet</a></li>
+            <li class="active"><a href="/weightlifting">Weightlifting</a></li>
+            <li class="active"><a href="/books">Books</a></li>
+            <li class="active"><a href="/finances">Finances</a></li>
+            <li class="active"><a href="/eeg">EEG</a></li>
+            <li class="divider active" style="padding-right:100px"></li>
+            <li class="active"><a href="/dayviewer">Day Viewer</a></li>
             <li class="dropdown active">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Analysis<span class="caret"></span></a>
                 <ul class="dropdown-menu">
@@ -35,10 +39,17 @@
                   <li><a href="#">Separated link</a></li>
                 </ul>
             </li>
+            <li class="divider active" style="padding-right:500px"></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="#">Settings</a></li>
-            <li class="active"><a href="#">Rebuild DB</a></li>
+            <li class="active"><a href="/settings">Settings</a></li>
+            <li class="dropdown active" style="padding-right:50px">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Database<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/update_db">Update</a></li>
+                  <li><a href="/rebuild_db">Rebuild</a></li>
+                </ul>
+            </li>
           </ul>
         </nav>
 
@@ -54,7 +65,18 @@
                 PDV3
                 {% endif %}
               </h2>
-              <div class="col-md-8">{% block main_ctnt %}{% endblock %}</div>
+              <div class="col-md-8">
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <ul>
+                    {% for message in messages %}
+                        <li>{{ message }} </li>
+                    {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
+                {% block main_ctnt %}{% endblock %}
+              </div>
             </div>
           </div>
         </div>

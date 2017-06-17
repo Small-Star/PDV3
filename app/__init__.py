@@ -1,4 +1,14 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-from app import views
+app.config.from_object('config')
+db = SQLAlchemy(app)
+
+from app import views, models, ingest
+
+#DB init
+db.create_all()
+
+print(app.config["SQLALCHEMY_DATABASE_URI"])
+ingest.ingest_mood()

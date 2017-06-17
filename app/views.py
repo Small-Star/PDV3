@@ -1,3 +1,6 @@
+#import sys
+#sys.path.insert(0, './app')
+
 from flask import render_template
 from app import app
 

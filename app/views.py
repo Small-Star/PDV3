@@ -1,8 +1,6 @@
-#import sys
-#sys.path.insert(0, './app')
-
 from flask import render_template
-from app import app
+from app import app, db
+from app.models import Mood
 
 @app.route("/")
 @app.route("/index")
@@ -13,7 +11,8 @@ def index():
 @app.route("/mood")
 def mood():
     title = "Mood"
-    return render_template("mood.html",title=title)
+    data = Mood.query.all()
+    return render_template("mood.html",data=data,title=title)
 
 @app.route("/body")
 def body():

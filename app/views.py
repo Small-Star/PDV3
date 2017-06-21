@@ -1,6 +1,7 @@
 from flask import render_template
 from app import app, db
 from app.models import Mood
+import graphs
 
 @app.route("/")
 @app.route("/index")
@@ -12,7 +13,8 @@ def index():
 def mood():
     title = "Mood"
     data = Mood.query.all()
-    return render_template("mood.html",data=data,title=title)
+    script, div = graphs.mood_graph(data)
+    return render_template("mood.html",data=data, script=script, div=div, title=title)
 
 @app.route("/body")
 def body():

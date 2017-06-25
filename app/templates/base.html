@@ -55,32 +55,33 @@
         </nav>
 
         <!--Main Content Container-->
-        <div class="container-fluid">
+        <div class="row col-lg-offset-1">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h1 class="panel-title"><b>
+            {% if title %}
+            {{ title }}
+            {% else %}
+            PDV3
+            {% endif %}
+          </b></h1></div></div>
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <ul>
+              {% for message in messages %}
+                  <li>{{ message }} </li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+        </div>
           <div class="row">
-            <div class="col-md-2">{% block info_bar_ctnt %}{% endblock %}</div>
-            <div class="col-md-8">
-              <h2>
-                {% if title %}
-                {{ title }}
-                {% else %}
-                PDV3
-                {% endif %}
-              </h2>
-              <div class="col-md-8">
-                {% with messages = get_flashed_messages() %}
-                  {% if messages %}
-                    <ul>
-                    {% for message in messages %}
-                        <li>{{ message }} </li>
-                    {% endfor %}
-                    </ul>
-                  {% endif %}
-                {% endwith %}
+            <div class="col-lg-2 col-lg-offset-1">{% block info_bar_ctnt %}{% endblock %}</div>
+            <div class="col-lg-8">
                 {% block main_ctnt %}{% endblock %}
-              </div>
             </div>
           </div>
-        </div>
+
   </body>
 
 </html>

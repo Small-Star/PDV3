@@ -10,6 +10,7 @@ decorator==4.0.11
 Flask==0.12.1
 Flask-SQLAlchemy==2.2
 Flask-WhooshAlchemy==0.56
+flexx==0.4.1
 idna==2.5
 itsdangerous==0.24
 Jinja2==2.9.6

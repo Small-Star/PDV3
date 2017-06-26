@@ -12,11 +12,25 @@
 {% endblock %}
 
 {% block main_ctnt %}
+<!-- Timeseries panel -->
 <div class="panel panel-primary">
   <div class="panel-heading">
-    <h3 class="panel-title">TIME SERIES</h3></div>
-<div class="panel-body">
-    {{ plot_div|safe }}
+    <h3 class="panel-title">TIME SERIES</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_time_series">
+  </div>
+  <div id="pan_time_series" class="panel-body panel-collapse collapse in">
+    {{ plot_ts_div|safe }}
+  </div>
+</div>
+
+<!-- Timeseries panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">VISUAL REPRESENTATION</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_vr">
+  </div>
+  <div id="pan_vr" class="panel-body panel-collapse collapse in">
+    {{ plot_vr_div|safe }}
   </div>
 </div>
 {% endblock %}

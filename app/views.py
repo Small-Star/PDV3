@@ -12,8 +12,8 @@ def index():
 @app.route("/mood")
 def mood():
     data = Mood.query.all()
-    stats, script, plot_div, slider_div = graphs.mood_graph(data)
-    return render_template("mood.html",data=data, script=script, plot_div=plot_div, slider_div=slider_div, stats=stats, title="MOOD")
+    stats, script, plot_ts_div, plot_vr_div, slider_div = graphs.mood_graph(data)
+    return render_template("mood.html",data=data, script=script, plot_ts_div=plot_ts_div, plot_vr_div=plot_vr_div, slider_div=slider_div, stats=stats, title="MOOD")
 
 @app.route("/body")
 def body():

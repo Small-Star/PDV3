@@ -16,19 +16,28 @@ class QS_Params(db.Model):
     protein_intake_error_bar = db.Column(db.Integer)
     carbs_intake = db.Column(db.Integer)
     net_carbs_intake = db.Column(db.Integer)
-    tdee_intake = db.Column(db.Integer)
-    tdee_intake_error_bar = db.Column(db.Integer)
+    tdee = db.Column(db.Integer)
+    tdee_error_bar = db.Column(db.Integer)
     cycle_phase = db.Column(db.String(length=2))
     cycle_num = db.Column(db.Integer)
 
     #Mood
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
 
-    def __init__(self, date):
+    def __init__(self, date, kcal_intake, protein_intake, protein_intake_error_bar, carbs_intake, net_carbs_intake, tdee, tdee_error_bar, cycle_phase, cycle_num):
         self.date = date
+        self.kcal_intake = kcal_intake
+        self.protein_intake = protein_intake
+        self.protein_intake_error_bar = protein_intake_error_bar
+        self.carbs_intake = carbs_intake
+        self.net_carbs_intake = net_carbs_intake
+        self.tdee = tdee
+        self.tdee_error_bar = tdee_error_bar
+        self.cycle_phase = cycle_phase
+        self.cycle_num = cycle_num
 
     def __repr__(self):
-        return str(self.date) + str(kcal_intake > 0)
+        return str(self.date) + str(self.kcal_intake)
 
 
 #Mood

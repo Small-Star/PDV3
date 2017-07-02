@@ -10,3 +10,4 @@ db = SQLAlchemy(app)
 from app import views, models, ingest
 db.create_all()
 ingest.ingest_mood()
+ingest.ingest_diet()

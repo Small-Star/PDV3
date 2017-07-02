@@ -1,7 +1,9 @@
 from flask import render_template
 from app import app, db
-from app.models import Mood
-import graphs
+from app.models import Mood, QS_Params
+import pandas as pd
+
+import graph_mood, graph_diet
 
 @app.route("/")
 @app.route("/index")
@@ -12,7 +14,7 @@ def index():
 @app.route("/mood")
 def mood():
     data = Mood.query.all()
-    stats, script, plot_ts_div, plot_vr_div, ma_slider_div = graphs.mood_graph(data)
+    stats, script, plot_ts_div, plot_vr_div, ma_slider_div = graph_mood.mood_graph(data)
     return render_template("mood.html",data=data, script=script, plot_ts_div=plot_ts_div, plot_vr_div=plot_vr_div, ma_slider_div=ma_slider_div, stats=stats, title="MOOD")
 
 @app.route("/body")
@@ -22,8 +24,10 @@ def body():
 
 @app.route("/diet")
 def diet():
-    title = "Diet"
-    return render_template("diet.html",title=title)
+    q = QS_Params.query.filter(QS_Params.kcal_intake >= 0)
+    data = pd.read_sql(q.statement, q.session.bind)
+    stats, script, plot_comparison_div, plot_composition_div, ma_slider_div = graph_diet.diet_graph(data)
+    return render_template("diet.html",data=data, script=script, plot_composition_div=plot_composition_div, plot_comparison_div=plot_comparison_div, ma_slider_div=ma_slider_div, stats=stats, title="DIET")
 
 @app.route("/weightlifting")
 def weightlifting():

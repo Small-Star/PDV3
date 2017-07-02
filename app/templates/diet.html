@@ -1,8 +1,57 @@
 {% extends "base.html" %}
+{% block head_ctnt %}
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.js"></script>
+  {{ script|safe }}
+{% endblock %}
+
 {% block main_ctnt %}
-    <h1>Diet</h1>
+<!-- Comparison panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">INTAKE V. OUTPUT COMPARISON</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_comparison">
+  </div>
+  <div id="pan_comparison" class="panel-body panel-collapse collapse in">
+    {{ plot_comparison_div|safe }}
+  </div>
+</div>
+
+<!-- Composition panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">INTAKE COMPOSITION</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_composition">
+  </div>
+  <div id="pan_vr" class="panel-body panel-collapse collapse in">
+    {{ plot_composition_div|safe }}
+  </div>
+</div>
 {% endblock %}
 
 {% block info_bar_ctnt %}
-    <h3>INFORMATION</h3>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">CONTROL</h3></div>
+  <div class="panel-body">
+      {{ ma_slider_div|safe }}
+    </div>
+  </div>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">INFORMATION</h3></div>
+    <div class="panel-body">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-info"><b>Days:</b> {{ stats.days }}</li>
+      </ul>
+
+
+      </div>
+      </div>
 {% endblock %}

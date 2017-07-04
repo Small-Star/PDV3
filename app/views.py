@@ -13,7 +13,8 @@ def index():
 
 @app.route("/mood")
 def mood():
-    data = Mood.query.all()
+    q = Mood.query.filter(Mood.date != None)
+    data = pd.read_sql(q.statement, q.session.bind)
     stats, script, plot_ts_div, plot_vr_div, ma_slider_div = graph_mood.mood_graph(data)
     return render_template("mood.html",data=data, script=script, plot_ts_div=plot_ts_div, plot_vr_div=plot_vr_div, ma_slider_div=ma_slider_div, stats=stats, title="MOOD")
 

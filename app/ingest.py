@@ -1,5 +1,5 @@
 from html.parser import HTMLParser
-import re, datetime, os
+import re, datetime, os, logging
 
 from app import app, db
 from app.models import Mood, QS_Params
@@ -52,12 +52,13 @@ def ingest_mood(date=""):
     t_a_ = [val_mood_params(t) for t in t_a]
 
     #Try and add entry to db
+    ad = 0;
     for _ in t_a_:
         if Mood.query.get(_.date) == None:
             db.session.add(Mood(_.date,_.a_l,_.a_u,_.a_s,_.v_l,_.v_u,_.v_s))
-            #print("Adding: " + str(_.date))
-        #else:
-            #print("Duplicate: " + str(_.date))
+            ad += 1
+
+    logging.info("Ingested %s mood records; Validated %s mood records; Added %s mood records", str(len(t_a)), str(len(t_a_)), str(ad))
 
     db.session.commit()
     print("Mood Ingest complete")
@@ -114,18 +115,20 @@ def ingest_diet(date=""):
     t_a_ = [val_diet_params(t) for t in t_a]
     #print("Days passing validation: " + str(len(t_a_)))
 
-    #ad, nad = 0,0
+    ad = 0
     #Try and add entry to db
     for _ in t_a_:
         if QS_Params.query.get(_.date) == None:
             db.session.add(QS_Params(_.date, _.kcal_intake, _.protein_intake, _.protein_intake_error_bar, _.carbs_intake, _.net_carbs_intake, _.tdee, _.tdee_error_bar, _.cycle_phase, _.cycle_num))
             #print("Adding QS Param: " + str(_.date) + str(_.kcal_intake))
-            #ad += 1
+            ad += 1
         #else:
             #print("Duplicate QS Param: " + str(_.date))
             #nad += 1
 
     #print("Added: " + str(ad) + "\nNot Added: " + str(nad) +" of "+ str(len(t_a)) + " " + str(len(t_a_)))
+
+    logging.info("Ingested %s diet records; Validated %s diet records; Added %s diet records", str(len(t_a)), str(len(t_a_)), str(ad))
 
     db.session.commit()
     print("Diet Ingest complete")

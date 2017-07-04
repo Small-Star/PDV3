@@ -3,7 +3,6 @@ sys.path.insert(0, './app')
 
 from app import db
 
-
 #Main DB
 class QS_Params(db.Model):
     __tablename__ = 'qs_params'
@@ -14,30 +13,39 @@ class QS_Params(db.Model):
     kcal_intake = db.Column(db.Integer)
     protein_intake = db.Column(db.Integer)
     protein_intake_error_bar = db.Column(db.Integer)
-    carbs_intake = db.Column(db.Integer)
-    net_carbs_intake = db.Column(db.Integer)
+    carb_intake = db.Column(db.Integer)
+    net_carb_intake = db.Column(db.Integer)
     tdee = db.Column(db.Integer)
     tdee_error_bar = db.Column(db.Integer)
     cycle_phase = db.Column(db.String(length=2))
     cycle_num = db.Column(db.Integer)
 
+    net_intake = db.Column(db.Float)
+    fiber_intake = db.Column(db.Float)
+    fat_intake = db.Column(db.Float)
+
     #Mood
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
 
-    def __init__(self, date, kcal_intake, protein_intake, protein_intake_error_bar, carbs_intake, net_carbs_intake, tdee, tdee_error_bar, cycle_phase, cycle_num):
+    def __init__(self, date, kcal_intake, protein_intake, protein_intake_error_bar, carb_intake, net_carb_intake, tdee, tdee_error_bar, cycle_phase, cycle_num):
         self.date = date
         self.kcal_intake = kcal_intake
         self.protein_intake = protein_intake
         self.protein_intake_error_bar = protein_intake_error_bar
-        self.carbs_intake = carbs_intake
-        self.net_carbs_intake = net_carbs_intake
+        self.carb_intake = carb_intake
+        self.net_carb_intake = net_carb_intake
         self.tdee = tdee
         self.tdee_error_bar = tdee_error_bar
         self.cycle_phase = cycle_phase
         self.cycle_num = cycle_num
 
+        #Derived values
+        self.net_intake = self.kcal_intake - self.tdee
+        self.fiber_intake = self.carb_intake - self.net_carb_intake #An approximation, but...
+        self.fat_intake = (self.kcal_intake - self.protein_intake*4.1 - self.net_carb_intake*3.8 - self.fiber_intake*1.9)/8.9 #This limb is very thin...
+
     def __repr__(self):
-        return str(self.date) + str(self.kcal_intake)
+        return str(self.date) + ": " + str(self.kcal_intake)
 
 
 #Mood

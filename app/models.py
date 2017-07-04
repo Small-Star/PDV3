@@ -2,6 +2,7 @@ import sys
 sys.path.insert(0, './app')
 
 from app import db
+from config import *
 
 #Main DB
 class QS_Params(db.Model):
@@ -40,9 +41,12 @@ class QS_Params(db.Model):
         self.cycle_num = cycle_num
 
         #Derived values
-        self.net_intake = self.kcal_intake - self.tdee
+        if self.tdee <= 0:  #This day has no TDEE recorded
+            self.net_intake = None
+        else:
+            self.net_intake = self.kcal_intake - self.tdee
         self.fiber_intake = self.carb_intake - self.net_carb_intake #An approximation, but...
-        self.fat_intake = (self.kcal_intake - self.protein_intake*4.1 - self.net_carb_intake*3.8 - self.fiber_intake*1.9)/8.9 #This limb is very thin...
+        self.fat_intake = (self.kcal_intake - self.protein_intake*ACF_P - self.net_carb_intake*ACF_C - self.fiber_intake*ACF_FI)/ACF_F #This limb is very thin...
 
     def __repr__(self):
         return str(self.date) + ": " + str(self.kcal_intake)

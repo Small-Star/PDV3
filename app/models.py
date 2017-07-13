@@ -12,6 +12,7 @@ class QS_Params(db.Model):
 
     #Diet
     kcal_intake = db.Column(db.Integer)
+    intake_error_bar = db.Column(db.Integer)
     protein_intake = db.Column(db.Integer)
     protein_intake_error_bar = db.Column(db.Integer)
     carb_intake = db.Column(db.Integer)
@@ -28,25 +29,35 @@ class QS_Params(db.Model):
     #Mood
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
 
-    def __init__(self, date, kcal_intake, protein_intake, protein_intake_error_bar, carb_intake, net_carb_intake, tdee, tdee_error_bar, cycle_phase, cycle_num):
+    def __init__(self, date, kcal_intake, intake_error_bar, protein_intake, protein_intake_error_bar, carb_intake, net_carb_intake, tdee, tdee_error_bar, cycle_phase, cycle_num):
         self.date = date
         self.kcal_intake = kcal_intake
+        self.intake_error_bar = intake_error_bar
         self.protein_intake = protein_intake
         self.protein_intake_error_bar = protein_intake_error_bar
         self.carb_intake = carb_intake
         self.net_carb_intake = net_carb_intake
-        self.tdee = tdee
+
+        if tdee == 0:   #CUll placeholder TDEEs
+            self.tdee = None
+        else:
+            self.tdee = tdee
+
         self.tdee_error_bar = tdee_error_bar
         self.cycle_phase = cycle_phase
         self.cycle_num = cycle_num
 
         #Derived values
-        if self.tdee <= 0:  #This day has no TDEE recorded
+        if self.tdee == None:  #This day has no TDEE recorded
+            self.net_intake = None
+        elif self.tdee <= 0:
             self.net_intake = None
         else:
             self.net_intake = self.kcal_intake - self.tdee
-        self.fiber_intake = self.carb_intake - self.net_carb_intake #An approximation, but...
-        self.fat_intake = (self.kcal_intake - self.protein_intake*ACF_P - self.net_carb_intake*ACF_C - self.fiber_intake*ACF_FI)/ACF_F #This limb is very thin...
+
+        if self.carb_intake > 0:#Assume if carb_intake is present than net_carb_intake will be as well
+            self.fiber_intake = self.carb_intake - self.net_carb_intake #An approximation, but...
+            self.fat_intake = (self.kcal_intake - self.protein_intake*ACF_P - self.net_carb_intake*ACF_C - self.fiber_intake*ACF_FI)/ACF_F #This limb is very thin...
 
     def __repr__(self):
         return str(self.date) + ": " + str(self.kcal_intake)

@@ -7,7 +7,7 @@ from app.models import Mood, QS_Params
 from collections import namedtuple
 
 Mood_Tup = namedtuple('Mood_Tup', 'date a_l a_u a_s v_l v_u v_s')
-Diet_Tup = namedtuple('Diet_Tup', 'date kcal_intake protein_intake protein_intake_error_bar carbs_intake net_carbs_intake tdee tdee_error_bar cycle_phase cycle_num')
+Diet_Tup = namedtuple('Diet_Tup', 'date kcal_intake intake_error_bar protein_intake protein_intake_error_bar carbs_intake net_carbs_intake tdee tdee_error_bar cycle_phase cycle_num')
 Diet_Tup.__new__.__defaults__ = (-1,) * len(Diet_Tup._fields)
 
 def ingest_mood(date=""):
@@ -72,12 +72,13 @@ def ingest_diet(date=""):
             HTMLParser.__init__(self)
 
             self.to_add = [] #List of tuples that will be returned for adding to the db
-            self.date, self.kcal_intake, self.protein_intake, self.protein_intake_error_bar, self.carbs_intake, self.net_carbs_intake, self.tdee, self.tdee_error_bar, self.cycle_phase, self.cycle_num = datetime.date(2100,1,1), -1, -1, -1, -1, -1, -1, -1, "", -1
+            self.date, self.kcal_intake, self.intake_error_bar, self.protein_intake, self.protein_intake_error_bar, self.carbs_intake, self.net_carbs_intake, self.tdee, self.cycle_phase, self.cycle_num = datetime.date(2100,1,1), -1, -1, -1, -1, -1, -1, -1, "", -1
 
             self.date_re = re.compile(r'- \d\d\/\d\d\/\d\d\d\d')      #ex: '03/22/2014'
             self.calorie_intake_re = re.compile(r'\s*Intake: ')
             self.protein_intake_re = re.compile(r'\s*Protein: ')
             self.tdee_re = re.compile(r'\s*Est. TDEE: ')
+            self.carbs_re = re.compile(r'\s*Carbs: ')
             self.fic_re = re.compile(r'\S+') #Note, this pattern is used on the BACKWARDS TDEE string
 
         def handle_data(self, data):
@@ -86,17 +87,23 @@ def ingest_diet(date=""):
                 self.date = datetime.datetime.strptime(data[2:-1],"%m/%d/%Y").date()
             elif re.match(self.calorie_intake_re,data) != None:
                 self.kcal_intake = int(re.split(self.calorie_intake_re,re.split("kcal",data)[0])[1])
+                self.intake_error_bar = int(re.findall("[0-9]*%",data)[0][:-1])
             elif re.match(self.protein_intake_re,data) != None:
                 self.protein_intake = int(re.split(self.protein_intake_re,re.split("g",data)[0])[1])
+                self.protein_intake_error_bar = int(re.findall("[0-9]*%",data)[0][:-1])
+            elif re.match(self.carbs_re,data) != None:
+                ci, nci = re.findall("[0-9]*g",data)
+                self.carbs_intake = int(ci[:-1])
+                self.net_carbs_intake = int(nci[:-1])
             elif re.match(self.tdee_re,data) != None:
                 self.tdee = int(re.split(self.tdee_re,re.split("kcal",data)[0])[1])#Match pattern, split away extraneous stuff
                 self.cycle_phase = re.search(self.fic_re,data[-2::]).group()     #Pulls out the endmost non-whitespace character(s)
 
                 #TDEEs are always the end of an entry; push the tuple to the to_add list
-                self.to_add.append(Diet_Tup(date=self.date, kcal_intake=self.kcal_intake, protein_intake=self.protein_intake, tdee=self.tdee, cycle_phase=self.cycle_phase)) #Pull in the rest later
+                self.to_add.append(Diet_Tup(date=self.date, kcal_intake=self.kcal_intake, intake_error_bar=self.intake_error_bar, protein_intake=self.protein_intake, protein_intake_error_bar=self.protein_intake_error_bar, carbs_intake=self.carbs_intake, net_carbs_intake=self.net_carbs_intake, tdee=self.tdee, cycle_phase=self.cycle_phase)) #Pull in the rest later
 
                 #Reset vals
-                self.date, self.kcal_intake, self.protein_intake, self.protein_intake_error_bar, self.carbs_intake, self.net_carbs_intake, self.tdee, self.tdee_error_bar, self.cycle_phase, self.cycle_num = datetime.date(2100,1,1), -1, -1, -1, -1, -1, -1, -1, "", -1
+                self.date, self.kcal_intake, self.intake_error_bar, self.protein_intake, self.protein_intake_error_bar, self.carbs_intake, self.net_carbs_intake, self.tdee, self.cycle_phase, self.cycle_num = datetime.date(2100,1,1), -1, -1, -1, -1, -1, -1, -1, "", -1
 
         def get_diets(self):
             return self.to_add
@@ -119,7 +126,7 @@ def ingest_diet(date=""):
     #Try and add entry to db
     for _ in t_a_:
         if QS_Params.query.get(_.date) == None:
-            db.session.add(QS_Params(_.date, _.kcal_intake, _.protein_intake, _.protein_intake_error_bar, _.carbs_intake, _.net_carbs_intake, _.tdee, _.tdee_error_bar, _.cycle_phase, _.cycle_num))
+            db.session.add(QS_Params(_.date, _.kcal_intake, _.intake_error_bar, _.protein_intake, _.protein_intake_error_bar, _.carbs_intake, _.net_carbs_intake, _.tdee, _.tdee_error_bar, _.cycle_phase, _.cycle_num))
             #print("Adding QS Param: " + str(_.date) + str(_.kcal_intake))
             ad += 1
         #else:

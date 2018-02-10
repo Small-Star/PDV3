@@ -26,41 +26,28 @@ class QS_Params(db.Model):
     fiber_intake = db.Column(db.Float)
     fat_intake = db.Column(db.Float)
 
-    #Mood
+    #Other Tables
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
+    journals = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
 
-    def __init__(self, date, kcal_intake, intake_error_bar, protein_intake, protein_intake_error_bar, carb_intake, net_carb_intake, tdee, tdee_error_bar, cycle_phase, cycle_num):
+    def __init__(self, date):
         self.date = date
-        self.kcal_intake = kcal_intake
-        self.intake_error_bar = intake_error_bar
-        self.protein_intake = protein_intake
-        self.protein_intake_error_bar = protein_intake_error_bar
-        self.carb_intake = carb_intake
-        self.net_carb_intake = net_carb_intake
 
-        if tdee == 0:   #CUll placeholder TDEEs
-            self.tdee = None
-        else:
-            self.tdee = tdee
+    def __repr__(self):
+        return str(self.date) + ": " + str(self.kcal_intake)
 
-        self.tdee_error_bar = tdee_error_bar
-        self.cycle_phase = cycle_phase
-        self.cycle_num = cycle_num
-
+    def compute_derived_vals(self):
         #Derived values
-        if self.tdee == None:  #This day has no TDEE recorded
+        if (self.tdee == None) or (self.tdee <= 0):  #This day has no TDEE recorded
+            self.tdee = None
             self.net_intake = None
-        elif self.tdee <= 0:
-            self.net_intake = None
+
         else:
             self.net_intake = self.kcal_intake - self.tdee
 
         if self.carb_intake > 0:#Assume if carb_intake is present than net_carb_intake will be as well
             self.fiber_intake = self.carb_intake - self.net_carb_intake #An approximation, but...
             self.fat_intake = (self.kcal_intake - self.protein_intake*ACF_P - self.net_carb_intake*ACF_C - self.fiber_intake*ACF_FI)/ACF_F #This limb is very thin...
-
-    def __repr__(self):
-        return str(self.date) + ": " + str(self.kcal_intake)
 
 
 #Mood
@@ -104,3 +91,8 @@ class Mood(db.Model):
 
     def __repr__(self):
         return str(self.date) + ":" + str(self.a_l) + ":" + str(self.a_u) + ":" + self.a_s + ":" + str(self.v_l) + ":" + str(self.v_u) + ":" + self.v_s
+
+# class Journals(db.Model):
+#     __tablename__ = 'journals'
+#     date = db.Column(db.Date, db.ForeignKey('qs_params.date'), index=True, unique=True, primary_key=True)
+#     qsp = db.relationship("QS_Params", back_populates="journals")

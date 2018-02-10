@@ -27,8 +27,8 @@ def body():
 def diet():
     q = QS_Params.query.filter(QS_Params.kcal_intake >= 0)
     data = pd.read_sql(q.statement, q.session.bind)
-    stats, script, plot_comparison_div, plot_composition_div, ma_slider_div = graph_diet.diet_graph(data)
-    return render_template("diet.html",data=data, script=script, plot_composition_div=plot_composition_div, plot_comparison_div=plot_comparison_div, ma_slider_div=ma_slider_div, stats=stats, title="DIET")
+    stats, script, div, plot_comparison_div, plot_composition_div, ma_slider_div = graph_diet.diet_graph(data)
+    return render_template("diet.html",data=data, script=script, div=div, plot_composition_div=plot_composition_div, plot_comparison_div=plot_comparison_div, ma_slider_div=ma_slider_div, stats=stats, title="DIET")
 
 @app.route("/weightlifting")
 def weightlifting():

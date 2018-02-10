@@ -26,6 +26,10 @@ class QS_Params(db.Model):
     fiber_intake = db.Column(db.Float)
     fat_intake = db.Column(db.Float)
 
+    #RHR
+    rhr_time = db.Column(db.String(length=5))    #TODO:Parse into datetime
+    bpm = db.Column(db.Integer)
+
     #Other Tables
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
     journals = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")

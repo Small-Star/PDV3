@@ -9,6 +9,7 @@ from collections import namedtuple
 Mood_Tup = namedtuple('Mood_Tup', 'date a_l a_u a_s v_l v_u v_s')
 Diet_Tup = namedtuple('Diet_Tup', 'date kcal_intake intake_error_bar protein_intake protein_intake_error_bar carb_intake net_carb_intake tdee tdee_error_bar cycle_phase cycle_num')
 Diet_Tup.__new__.__defaults__ = (-1,) * len(Diet_Tup._fields)
+RHR_Tup = namedtuple('RHR_Tup', 'date rhr_time bpm')
 
 def ingest_mood(date=""):
     '''Reads data from MOOD_FILE and inputs it into db'''
@@ -130,7 +131,6 @@ def ingest_diet(date=""):
             q = QS_Params(_.date)
             db.session.add(q)
 
-
         q = QS_Params.query.get(_.date)
         q.kcal_intake = _.kcal_intake
         q.intake_error_bar = _.intake_error_bar
@@ -147,16 +147,66 @@ def ingest_diet(date=""):
         ad += 1
 
     db.session.commit()
-            #db.session.add(QS_Params(_.date, _.kcal_intake, _.intake_error_bar, _.protein_intake, _.protein_intake_error_bar, _.carb_intake, _.net_carb_intake, _.tdee, _.tdee_error_bar, _.cycle_phase, _.cycle_num))
-            #print("Adding QS Param: " + str(_.date) + str(_.kcal_intake))
-
-        #else:
-            #print("Duplicate QS Param: " + str(_.date))
-            #nad += 1
-
-    #print("Added: " + str(ad) + "\nNot Added: " + str(nad) +" of "+ str(len(t_a)) + " " + str(len(t_a_)))
-
     logging.info("Ingested %s diet records; Validated %s diet records; Added %s diet records", str(len(t_a)), str(len(t_a_)), str(ad))
+    print("Diet Ingest complete")
+
+
+def ingest_rhr(date=""):
+    '''Reads data from RHR_FILE and inputs it into db'''
+
+    class RHR_HTML_Parser(HTMLParser):
+        ''' Input an xml file, return a list of tuples to add to the db'''
+        def __init__(self):
+            HTMLParser.__init__(self)
+
+            self.to_add = [] #List of tuples that will be returned for adding to the db
+            self.date, self.rhr_time, self.bpm = datetime.date(2100,1,1), "01:01", -1
+
+            self.date_re = re.compile(r'\d\d\/\d\d\/\d\d\d\d')      #ex: '03/22/2014'
+
+        def handle_data(self, data):
+            #Line by line parsing of input data
+            data_ = data.strip()    #Drop whitespace
+            if re.match(self.date_re,data_) != None:
+                self.date = datetime.datetime.strptime(data_[:10],"%m/%d/%Y").date()
+                self.rhr_time = re.split(";",data_)[1]
+                self.bpm = re.split(";",data_)[2][:-3]
+                self.to_add.append(RHR_Tup(date=self.date, rhr_time=self.rhr_time, bpm=self.bpm))
+
+                #Reset vals
+                self.date, self.rhr_time, self.bpm = datetime.date(2100,1,1), -1, -1
+
+        def get_rhrs(self):
+            return self.to_add
+
+    #Validate
+    def val_rhr_params(dt):
+        #***TODO: Valiadate
+        return dt
+
+    RHR_Parser = RHR_HTML_Parser()
+    f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["RHR_FILE"]), 'r')
+
+    #Read data
+    RHR_Parser.feed(f_name.read())
+    t_a = RHR_Parser.get_rhrs()
+    #print("Days read: " + str(len(t_a)))
+    t_a_ = [val_rhr_params(t) for t in t_a]
+    #print("Days passing validation: " + str(len(t_a_)))
+
+    ad = 0
+    #Try and add entry to db
+    for _ in t_a_:
+        if QS_Params.query.get(_.date) == None:
+            q = QS_Params(_.date)
+            db.session.add(q)
+
+        q = QS_Params.query.get(_.date)
+        q.rhr_time = _.rhr_time
+        q.bpm = _.bpm
+
+        ad += 1
 
     db.session.commit()
-    print("Diet Ingest complete")
+    logging.info("Ingested %s RHR records; Validated %s RHR records; Added %s RHR records", str(len(t_a)), str(len(t_a_)), str(ad))
+    print("RHR Ingest complete")

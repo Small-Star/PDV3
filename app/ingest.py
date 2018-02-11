@@ -39,7 +39,7 @@ def ingest_mood(date=""):
             assert mt.a_s in MOOD_S and mt.v_s in MOOD_S, "s value"
             return mt
         except Exception as e:
-            print("Validation error in mood ingest for date " + str(mt.date) + ": " + e.args[0])
+            logging.warning("Validation error in mood ingest for date " + str(mt.date) + ": " + e.args[0])
             return Mood_Tup(date=datetime.date(2100,1,1), a_l=5,a_u=5,a_s='N',v_l=5,v_u=5,v_s='N')
 
     Mood_Parser = Mood_HTML_Parser()
@@ -111,8 +111,24 @@ def ingest_diet(date=""):
             return self.to_add
     #Validate
     def val_diet_params(dt):
-        #***TODO: Valiadate
-        return dt
+        CYCLE_PHASES = ['C', 'B', 'M', 'N', 'F', 'FB']
+        try:
+            assert type(dt.date)==datetime.date and dt.date >= datetime.date(2014,1,1), "date"
+            assert dt.kcal_intake >=0, "kcal_intake"
+            assert dt.intake_error_bar >=0, "intake_error_bar"
+            assert dt.protein_intake >=0, "protein_intake"
+            assert dt.protein_intake_error_bar >=0, "protein_intake_error_bar"
+            assert dt.carb_intake >=0 or dt.date < datetime.date(2017,4,10), "carb_intake" #Note: 04/10/2017 is the start date for recording carb macros
+            assert (dt.net_carb_intake >=0 and dt.net_carb_intake <= dt.carb_intake)  or dt.date < datetime.date(2017,4,10), "net_carb_intake"
+            assert (dt.tdee >= 1600) or (dt.tdee == 0 and dt.date <= datetime.date(2015,4,6)), "tdee" #Note: 04/06/2015 is the start date for recording carb macros
+            #assert dt.tdee_error_bar >=0, "tdee_error_bar" #Why is this here?
+            assert dt.cycle_phase.upper() in CYCLE_PHASES, "cycle_phase"
+            #assert dt.cycle_num >0 and dt.cycle_num < 100, "cycle_num" #TODO: Put this into the ingest
+            return dt
+        except Exception as e:
+            logging.warning("Validation error in Diet ingest for date " + str(dt.date) + ": " + e.args[0])
+            return Diet_Tup(date=datetime.date(2100,1,1), kcal_intake=-1, intake_error_bar=-1, protein_intake=-1, protein_intake_error_bar=-1, carb_intake=-1, net_carb_intake=-1, tdee=-1, tdee_error_bar=-1, cycle_phase="N", cycle_num=-1)
+
 
     Diet_Parser = Diet_HTML_Parser()
     f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["DIET_FILE"]), 'r')
@@ -169,8 +185,9 @@ def ingest_rhr(date=""):
             data_ = data.strip()    #Drop whitespace
             if re.match(self.date_re,data_) != None:
                 self.date = datetime.datetime.strptime(data_[:10],"%m/%d/%Y").date()
-                self.rhr_time = re.split(";",data_)[1]
-                self.bpm = re.split(";",data_)[2][:-3]
+                time_str = re.split(";",data_)[1]
+                self.rhr_time = datetime.datetime.fromordinal((self.date.toordinal())) + datetime.timedelta(hours=int(time_str[0:2]),minutes=int(time_str[3:]))
+                self.bpm = int(re.split(";",data_)[2][:-3])
                 self.to_add.append(RHR_Tup(date=self.date, rhr_time=self.rhr_time, bpm=self.bpm))
 
                 #Reset vals
@@ -180,9 +197,15 @@ def ingest_rhr(date=""):
             return self.to_add
 
     #Validate
-    def val_rhr_params(dt):
-        #***TODO: Valiadate
-        return dt
+    def val_rhr_params(rt):
+        try:
+            assert type(rt.date)==datetime.date and rt.date >= datetime.date(2017,5,1), "date"
+            assert rt.bpm > 40 and rt.bpm < 120, "bpm"
+            assert type(rt.rhr_time)==datetime.datetime, "rhr_time"
+            return rt
+        except Exception as e:
+            logging.warning("Validation error in RHR ingest for date " + str(rt.date) + ": " + e.args[0])
+            return RHR_Tup(date=datetime.date(2100,1,1), rhr_time=datetime.datetime(2100,1,1,1,1), bpm=-1)
 
     RHR_Parser = RHR_HTML_Parser()
     f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["RHR_FILE"]), 'r')

@@ -9,6 +9,7 @@ app.config.from_object('config')
 
 logging.basicConfig(filename=app.config["LOG_FILE"], level=logging.DEBUG, format='%(levelname)s: %(asctime)s: %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
+logging.info("-------------")
 logging.info("Loading db...")
 db = SQLAlchemy(app)
 
@@ -21,3 +22,5 @@ logging.info("Ingesting diet data...")
 ingest.ingest_diet()
 logging.info("Ingesting heart rate data...")
 ingest.ingest_rhr()
+
+logging.info("-------------")

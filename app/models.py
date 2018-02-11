@@ -27,7 +27,7 @@ class QS_Params(db.Model):
     fat_intake = db.Column(db.Float)
 
     #RHR
-    rhr_time = db.Column(db.String(length=5))    #TODO:Parse into datetime
+    rhr_time = db.Column(db.DateTime)
     bpm = db.Column(db.Integer)
 
     #Other Tables

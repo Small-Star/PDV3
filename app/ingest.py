@@ -10,6 +10,7 @@ Mood_Tup = namedtuple('Mood_Tup', 'date a_l a_u a_s v_l v_u v_s')
 Diet_Tup = namedtuple('Diet_Tup', 'date kcal_intake intake_error_bar protein_intake protein_intake_error_bar carb_intake net_carb_intake tdee tdee_error_bar cycle_phase cycle_num')
 Diet_Tup.__new__.__defaults__ = (-1,) * len(Diet_Tup._fields)
 RHR_Tup = namedtuple('RHR_Tup', 'date rhr_time bpm')
+Sleep_Tup = namedtuple('Sleep_Tup', 'date sleep_onset sleep_duration sleep_how_much_more sleep_how_deep sleep_interruptions sleep_overall_q')
 
 def ingest_mood(date=""):
     '''Reads data from MOOD_FILE and inputs it into db'''
@@ -166,7 +167,6 @@ def ingest_diet(date=""):
     logging.info("Ingested %s diet records; Validated %s diet records; Added %s diet records", str(len(t_a)), str(len(t_a_)), str(ad))
     print("Diet Ingest complete")
 
-
 def ingest_rhr(date=""):
     '''Reads data from RHR_FILE and inputs it into db'''
 
@@ -233,3 +233,82 @@ def ingest_rhr(date=""):
     db.session.commit()
     logging.info("Ingested %s RHR records; Validated %s RHR records; Added %s RHR records", str(len(t_a)), str(len(t_a_)), str(ad))
     print("RHR Ingest complete")
+
+def ingest_sleep(date=""):
+    '''Reads data from SLEEP_FILE and inputs it into db'''
+
+    class Sleep_HTML_Parser(HTMLParser):
+        ''' Input an xml file, return a list of tuples to add to the db'''
+        def __init__(self):
+            HTMLParser.__init__(self)
+
+            self.to_add = [] #List of tuples that will be returned for adding to the db
+            self.date, self.sleep_onset, self.sleep_duration, self.sleep_how_much_more, self.sleep_how_deep, self.sleep_interruptions, self.sleep_overall_q = datetime.date(2100,1,1), "01:01", -1, -1, -1, -1, -1
+
+            self.date_re = re.compile(r'\d\d\/\d\d\/\d\d\d\d')      #ex: '03/22/2014'
+
+        def handle_data(self, data):
+            #Line by line parsing of input data
+            data_ = data.strip()    #Drop whitespace
+            if re.match(self.date_re,data_) != None:
+                self.date = datetime.datetime.strptime(data_[:10],"%m/%d/%Y").date()
+                time_str = re.split(";",data_)[1]
+                self.sleep_onset = datetime.datetime.fromordinal((self.date.toordinal())) + datetime.timedelta(hours=int(time_str[0:2]),minutes=int(time_str[3:]))
+                self.sleep_duration = float(re.split(";",data_)[2])
+                self.sleep_how_much_more = int(re.split(";",data_)[3])
+                self.sleep_how_deep = int(re.split(";",data_)[4])
+                self.sleep_interruptions = int(re.split(";",data_)[5])
+                self.sleep_overall_q = int(re.split(";",data_)[6])
+                self.to_add.append(Sleep_Tup(date=self.date, sleep_onset=self.sleep_onset, sleep_duration=self.sleep_duration, sleep_how_much_more=self.sleep_how_much_more, sleep_how_deep=self.sleep_how_deep, sleep_interruptions=self.sleep_interruptions, sleep_overall_q=self.sleep_overall_q))
+
+                #Reset vals
+                self.date, self.sleep_onset, self.sleep_duration, self.sleep_how_much_more, self.sleep_how_deep, self.sleep_interruptions, self.sleep_overall_q = datetime.date(2100,1,1), "01:01", -1, -1, -1, -1, -1
+
+        def get_sleeps(self):
+            return self.to_add
+
+    #Validate
+    def val_sleep_params(st):
+        try:
+            assert type(st.date)==datetime.date and st.date >= datetime.date(2017,4,17), "date"
+            assert type(st.sleep_onset)==datetime.datetime, "sleep_onset"
+            assert st.sleep_duration > 0 and st.sleep_duration < 16, "sleep_duration"
+            assert st.sleep_how_much_more > 0 and st.sleep_how_much_more < 10, "sleep_how_much_more"
+            assert st.sleep_how_deep > 0 and st.sleep_how_deep < 10, "sleep_how_deep"
+            assert st.sleep_interruptions > 0 and st.sleep_interruptions < 10, "sleep_interruptions"
+            assert st.sleep_overall_q > 0 and st.sleep_overall_q < 10, "sleep_overall_q"
+            return st
+        except Exception as e:
+            logging.warning("Validation error in Sleep ingest for date " + str(st.date) + ": " + e.args[0])
+            return Sleep_Tup(date=datetime.date(2100,1,1), sleep_onset=datetime.datetime(2100,1,1,1,1), sleep_duration=-1, sleep_how_much_more=-1, sleep_how_deep=-1, sleep_interruptions=-1, sleep_overall_q=-1)
+
+    Sleep_Parser = Sleep_HTML_Parser()
+    f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["SLEEP_FILE"]), 'r')
+
+    #Read data
+    Sleep_Parser.feed(f_name.read())
+    t_a = Sleep_Parser.get_sleeps()
+    #print("Days read: " + str(len(t_a)))
+    t_a_ = [val_sleep_params(t) for t in t_a]
+    #print("Days passing validation: " + str(len(t_a_)))
+
+    ad = 0
+    #Try and add entry to db
+    for _ in t_a_:
+        if QS_Params.query.get(_.date) == None:
+            q = QS_Params(_.date)
+            db.session.add(q)
+
+        q = QS_Params.query.get(_.date)
+        q.sleep_onset = _.sleep_onset
+        q.sleep_duration = _.sleep_duration
+        q.sleep_how_much_more = _.sleep_how_much_more
+        q.sleep_how_deep = _.sleep_how_deep
+        q.sleep_interruptions = _.sleep_interruptions
+        q.sleep_overall_q = _.sleep_overall_q
+
+        ad += 1
+
+    db.session.commit()
+    logging.info("Ingested %s Sleep records; Validated %s Sleep records; Added %s Sleep records", str(len(t_a)), str(len(t_a_)), str(ad))
+    print("Sleep Ingest complete")

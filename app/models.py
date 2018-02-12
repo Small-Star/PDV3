@@ -30,6 +30,14 @@ class QS_Params(db.Model):
     rhr_time = db.Column(db.DateTime)
     bpm = db.Column(db.Integer)
 
+    #Sleep
+    sleep_onset = db.Column(db.DateTime)
+    sleep_duration = db.Column(db.Float)
+    sleep_how_much_more = db.Column(db.Integer)
+    sleep_how_deep = db.Column(db.Integer)
+    sleep_interruptions = db.Column(db.Integer)
+    sleep_overall_q = db.Column(db.Integer)
+
     #Other Tables
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
     journals = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")

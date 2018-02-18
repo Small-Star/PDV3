@@ -9,8 +9,9 @@ from collections import namedtuple
 Mood_Tup = namedtuple('Mood_Tup', 'date a_l a_u a_s v_l v_u v_s')
 Diet_Tup = namedtuple('Diet_Tup', 'date kcal_intake intake_error_bar protein_intake protein_intake_error_bar carb_intake net_carb_intake tdee tdee_error_bar cycle_phase cycle_num')
 Diet_Tup.__new__.__defaults__ = (-1,) * len(Diet_Tup._fields)
-RHR_Tup = namedtuple('RHR_Tup', 'date rhr_time bpm')
-Sleep_Tup = namedtuple('Sleep_Tup', 'date sleep_onset sleep_duration sleep_how_much_more sleep_how_deep sleep_interruptions sleep_overall_q')
+Rhr_Tup = namedtuple('Rhr_Tup', 'date rhr_time bpm')
+Sleep_Tup = namedtuple('Sleep_Tup', 'date sleep_onset sleep_duration sleep_how_much_more sleep_how_deep sleep_interruptions sleep_overall_q sleep_notes')
+Blood_Tup = namedtuple('Blood_Tup', 'date glucose_time glucose ketones_time ketones blood_notes')
 
 def ingest_mood(date=""):
     '''Reads data from MOOD_FILE and inputs it into db'''
@@ -188,7 +189,7 @@ def ingest_rhr(date=""):
                 time_str = re.split(";",data_)[1]
                 self.rhr_time = datetime.datetime.fromordinal((self.date.toordinal())) + datetime.timedelta(hours=int(time_str[0:2]),minutes=int(time_str[3:]))
                 self.bpm = int(re.split(";",data_)[2][:-3])
-                self.to_add.append(RHR_Tup(date=self.date, rhr_time=self.rhr_time, bpm=self.bpm))
+                self.to_add.append(Rhr_Tup(date=self.date, rhr_time=self.rhr_time, bpm=self.bpm))
 
                 #Reset vals
                 self.date, self.rhr_time, self.bpm = datetime.date(2100,1,1), -1, -1
@@ -205,7 +206,7 @@ def ingest_rhr(date=""):
             return rt
         except Exception as e:
             logging.warning("Validation error in RHR ingest for date " + str(rt.date) + ": " + e.args[0])
-            return RHR_Tup(date=datetime.date(2100,1,1), rhr_time=datetime.datetime(2100,1,1,1,1), bpm=-1)
+            return Rhr_Tup(date=datetime.date(2100,1,1), rhr_time=datetime.datetime(2100,1,1,1,1), bpm=-1)
 
     RHR_Parser = RHR_HTML_Parser()
     f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["RHR_FILE"]), 'r')
@@ -243,7 +244,7 @@ def ingest_sleep(date=""):
             HTMLParser.__init__(self)
 
             self.to_add = [] #List of tuples that will be returned for adding to the db
-            self.date, self.sleep_onset, self.sleep_duration, self.sleep_how_much_more, self.sleep_how_deep, self.sleep_interruptions, self.sleep_overall_q = datetime.date(2100,1,1), "01:01", -1, -1, -1, -1, -1
+            self.date, self.sleep_onset, self.sleep_duration, self.sleep_how_much_more, self.sleep_how_deep, self.sleep_interruptions, self.sleep_overall_q, self.sleep_notes = datetime.date(2100,1,1), "01:01", -1, -1, -1, -1, -1, ""
 
             self.date_re = re.compile(r'\d\d\/\d\d\/\d\d\d\d')      #ex: '03/22/2014'
 
@@ -259,10 +260,15 @@ def ingest_sleep(date=""):
                 self.sleep_how_deep = int(re.split(";",data_)[4])
                 self.sleep_interruptions = int(re.split(";",data_)[5])
                 self.sleep_overall_q = int(re.split(";",data_)[6])
-                self.to_add.append(Sleep_Tup(date=self.date, sleep_onset=self.sleep_onset, sleep_duration=self.sleep_duration, sleep_how_much_more=self.sleep_how_much_more, sleep_how_deep=self.sleep_how_deep, sleep_interruptions=self.sleep_interruptions, sleep_overall_q=self.sleep_overall_q))
+                if len(re.split(";",data_)) >= 8:
+                    #print(self.date, len(data_))
+                    self.sleep_notes = re.split(";",data_)[7][6:]
+                else:
+                    self.sleep_notes = ""
+                self.to_add.append(Sleep_Tup(date=self.date, sleep_onset=self.sleep_onset, sleep_duration=self.sleep_duration, sleep_how_much_more=self.sleep_how_much_more, sleep_how_deep=self.sleep_how_deep, sleep_interruptions=self.sleep_interruptions, sleep_overall_q=self.sleep_overall_q, sleep_notes=self.sleep_notes))
 
                 #Reset vals
-                self.date, self.sleep_onset, self.sleep_duration, self.sleep_how_much_more, self.sleep_how_deep, self.sleep_interruptions, self.sleep_overall_q = datetime.date(2100,1,1), "01:01", -1, -1, -1, -1, -1
+                self.date, self.sleep_onset, self.sleep_duration, self.sleep_how_much_more, self.sleep_how_deep, self.sleep_interruptions, self.sleep_overall_q, self.sleep_notes = datetime.date(2100,1,1), "01:01", -1, -1, -1, -1, -1, ""
 
         def get_sleeps(self):
             return self.to_add
@@ -280,7 +286,7 @@ def ingest_sleep(date=""):
             return st
         except Exception as e:
             logging.warning("Validation error in Sleep ingest for date " + str(st.date) + ": " + e.args[0])
-            return Sleep_Tup(date=datetime.date(2100,1,1), sleep_onset=datetime.datetime(2100,1,1,1,1), sleep_duration=-1, sleep_how_much_more=-1, sleep_how_deep=-1, sleep_interruptions=-1, sleep_overall_q=-1)
+            return Sleep_Tup(date=datetime.date(2100,1,1), sleep_onset=datetime.datetime(2100,1,1,1,1), sleep_duration=-1, sleep_how_much_more=-1, sleep_how_deep=-1, sleep_interruptions=-1, sleep_overall_q=-1, sleep_notes="")
 
     Sleep_Parser = Sleep_HTML_Parser()
     f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["SLEEP_FILE"]), 'r')
@@ -306,9 +312,98 @@ def ingest_sleep(date=""):
         q.sleep_how_deep = _.sleep_how_deep
         q.sleep_interruptions = _.sleep_interruptions
         q.sleep_overall_q = _.sleep_overall_q
+        q.sleep_notes = _.sleep_notes
 
         ad += 1
 
     db.session.commit()
     logging.info("Ingested %s Sleep records; Validated %s Sleep records; Added %s Sleep records", str(len(t_a)), str(len(t_a_)), str(ad))
     print("Sleep Ingest complete")
+
+def ingest_blood(date=""):
+    '''Reads data from BLOOD_FILE and inputs it into db'''
+
+    class Blood_HTML_Parser(HTMLParser):
+        ''' Input an xml file, return a list of tuples to add to the db'''
+        def __init__(self):
+            HTMLParser.__init__(self)
+
+            self.to_add = [] #List of tuples that will be returned for adding to the db
+            self.date, self.glucose_time, self.glucose, self.ketones_time, self.ketones, self.blood_notes = datetime.date(2100,1,1), None, None, None, None, ""
+
+            self.k_g_toggle = 'g'
+
+            self.date_re = re.compile(r'\d\d\/\d\d\/\d\d\d\d')      #ex: '03/22/2014'
+            self.notes_re = re.compile(r'- Notes - (?P<blood_notes_g>.*)')
+            self.glucose_re = re.compile(r'- (?P<glucose_time_g>\d\d:\d\d) - Blood Glucose: (?P<glucose_g>\d+) mg/dl')
+            self.ketones_re = re.compile(r'- (?P<ketones_time_g>\d\d:\d\d) - Ketones: (?P<ketones_g>\d*.\d*)mmol/l')
+        def handle_data(self, data):
+            #Line by line parsing of input data
+            #TODO: Pull in second/third/etc. measurements
+            data_ = data.strip()    #Drop whitespace
+            if re.match(self.date_re,data_) != None:
+                self.to_add.append(Blood_Tup(date=self.date, glucose_time=self.glucose_time, glucose=self.glucose, ketones_time=self.ketones_time, ketones=self.ketones, blood_notes=self.blood_notes))
+                self.date, self.glucose_time, self.glucose, self.ketones_time, self.ketones, self.blood_notes = datetime.date(2100,1,1), None, None, None, None, ""
+                self.date = datetime.datetime.strptime(data_[:10],"%m/%d/%Y").date()
+            elif (re.match(self.glucose_re,data_) != None) and (self.glucose == None): #Conditional makes sure second/third values do not overwrite morning reading
+                _ = re.search(self.glucose_re,data_)
+                g = _.group('glucose_time_g')
+                self.glucose_time = datetime.datetime.fromordinal((self.date.toordinal())) + datetime.timedelta(hours=int(g[0:2]),minutes=int(g[3:]))
+                self.glucose = int(_.group('glucose_g'))
+            elif (re.match(self.ketones_re,data_) != None) and (self.ketones == None): #Conditional makes sure second/third values do not overwrite morning reading
+                _ = re.search(self.ketones_re,data_)
+                g = _.group('ketones_time_g')
+                self.ketones_time = datetime.datetime.fromordinal((self.date.toordinal())) + datetime.timedelta(hours=int(g[0:2]),minutes=int(g[3:]))
+                self.ketones = float(_.group('ketones_g'))
+            elif re.match(self.notes_re, data_):
+                self.blood_notes = re.search(self.notes_re,data_).group('blood_notes_g')
+
+        def get_bloods(self):
+            self.to_add.append(Blood_Tup(date=self.date, glucose_time=self.glucose_time, glucose=self.glucose, ketones_time=self.ketones_time, ketones=self.ketones, blood_notes=self.blood_notes))
+            return self.to_add[1:]
+
+    #Validate
+    def val_blood_params(bt):
+        try:
+            assert type(bt.date)==datetime.date and bt.date >= datetime.date(2017,4,10), "date"
+            if bt.glucose_time != None:
+                assert type(bt.glucose_time)==datetime.datetime, "glucose_time"
+                assert bt.glucose > 40 and bt.glucose < 200, "glucose"
+            if bt.ketones_time != None:
+                assert type(bt.ketones_time)==datetime.datetime, "ketones_time"
+                assert bt.ketones > 0 and bt.ketones < 9, "ketones"
+            assert type(bt.blood_notes)==str, "blood_notes"
+            return bt
+        except Exception as e:
+            logging.warning("Validation error in Blood ingest for date " + str(bt.date) + ": " + e.args[0])
+            return Blood_Tup(date=datetime.date(2100,1,1), glucose_time=None, glucose=None, ketones_time=None, ketones=None, blood_notes="")
+
+    Blood_Parser = Blood_HTML_Parser()
+    f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["BLOOD_FILE"]), 'r')
+
+    #Read data
+    Blood_Parser.feed(f_name.read())
+    t_a = Blood_Parser.get_bloods()
+    #print("Days read: " + str(len(t_a)))
+    t_a_ = [val_blood_params(t) for t in t_a]
+    #print("Days passing validation: " + str(len(t_a_)))
+
+    ad = 0
+    #Try and add entry to db
+    for _ in t_a_:
+        if QS_Params.query.get(_.date) == None:
+            q = QS_Params(_.date)
+            db.session.add(q)
+
+        q = QS_Params.query.get(_.date)
+        q.glucose_time = _.glucose_time
+        q.glucose = _.glucose
+        q.ketones_time = _.ketones_time
+        q.ketones = _.ketones
+        q.blood_notes = _.blood_notes
+
+        ad += 1
+
+    db.session.commit()
+    logging.info("Ingested %s Blood records; Validated %s Blood records; Added %s Blood records", str(len(t_a)), str(len(t_a_)), str(ad))
+    print("Blood Ingest complete")

@@ -24,5 +24,7 @@ logging.info("Ingesting heart rate data...")
 ingest.ingest_rhr()
 logging.info("Ingesting sleep data...")
 ingest.ingest_sleep()
+logging.info("Ingesting blood data...")
+ingest.ingest_blood()
 
 logging.info("-------------")

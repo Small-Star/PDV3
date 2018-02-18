@@ -37,6 +37,14 @@ class QS_Params(db.Model):
     sleep_how_deep = db.Column(db.Integer)
     sleep_interruptions = db.Column(db.Integer)
     sleep_overall_q = db.Column(db.Integer)
+    sleep_notes = db.Column(db.String(length=100))
+
+    #Blood
+    glucose_time = db.Column(db.DateTime)
+    glucose = db.Column(db.Integer)
+    ketones_time = db.Column(db.DateTime)
+    ketones = db.Column(db.Float)
+    blood_notes = db.Column(db.String(length=100))
 
     #Other Tables
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")

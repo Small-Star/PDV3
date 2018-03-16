@@ -48,19 +48,20 @@
         <h3 class="panel-title">INFORMATION</h3></div>
     <div class="panel-body">
       <ul class="list-group">
-        <li class="list-group-item list-group-item-info"><b>Days:</b> {{ stats.days }}</li>
-        <li class="list-group-item"><b>Avg. Intake (kcal):</b> {{ stats.avg_intake }}</li>
-        <li class="list-group-item"><b>Avg. TDEE (kcal):</b> {{ stats.avg_tdee }}</li>
-        <li class="list-group-item"><b>Avg. Net (kcal):</b> {{ stats.avg_net }}</li>
-        <li class="list-group-item"><b>Avg. Protein (g):</b> {{ stats.avg_protein }}</li>
-        <li class="list-group-item"><b>Avg. Fat (Imputed) (g):</b> {{ stats.avg_fat }}</li>
-        <li class="list-group-item"><b>Avg. Carb (all) (g):</b> {{ stats.avg_carb }}</li>
-        <li class="list-group-item"><b>Avg. Carb (net):</b> {{ stats.avg_net_carb }}</li>
-        <li class="list-group-item"><b>Avg. Carb (fiber):</b> {{ stats.avg_fiber }}</li>
-        <li class="list-group-item"><b>Problem Days:</b> {{ stats.problem_days }}</li>
+        <li class="list-group-item list-group-item-info"><b>Days:</b> {{ div_days|safe }}</li>
+        <li class="list-group-item"><b>Avg. Intake (kcal):</b> {{ div_avg_intake|safe }}</li>
+        <li class="list-group-item"><b>Avg. TDEE (kcal):</b> {{ div_tdee|safe }}</li>
+        <li class="list-group-item"><b>Avg. Net (kcal):</b> {{ div_avg_net|safe }}</li>
+        <li class="list-group-item"><b>Avg. Protein (g):</b> {{ div_avg_protein|safe }}</li>
+        <li class="list-group-item"><b>Avg. Fat (Imputed) (g):</b> {{ div_avg_fat|safe }}</li>
+        <li class="list-group-item"><b>Avg. Carb (all) (g):</b> {{ div_avg_carb_all|safe }}</li>
+        <li class="list-group-item"><b>Avg. Carb (net):</b> {{ div_avg_carb_net|safe }}</li>
+        <li class="list-group-item"><b>Avg. Carb (fiber):</b> {{ div_avg_carb_fiber|safe }}</li>
+        <li class="list-group-item"><b>Problem Days:</b> {{ div_problem_days|safe }}</li>
+        <li class="list-group-item"><b>Volatility:</b> {{ div_volatility|safe }}</li>
       </ul>
 
       </div>
     </div>
-          {{ div|safe }}
+
 {% endblock %}

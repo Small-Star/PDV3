@@ -17,9 +17,9 @@ def diet_graph(data):
 
     stats = diet_stats(data)
 
-    script_div, (div, plot_comparison_div, plot_composition_div, ma_slider_div) = diet_figs(data)
+    script_div, (div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison_div, plot_composition_div, ma_slider_div) = diet_figs(data)
 
-    return stats, script_div, div, plot_comparison_div, plot_composition_div, ma_slider_div
+    return stats, script_div, div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison_div, plot_composition_div, ma_slider_div
 
 def diet_figs(data, height=500, width=1200):
 
@@ -42,8 +42,8 @@ def diet_figs(data, height=500, width=1200):
 
 
 
-    ma_cds_working = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], kcal_intake=data['kcal_intake'], tdee=data['tdee'], protein_g=data['protein_intake'], protein_intake=data['protein_intake'].transform(lambda x: x*ACF_P), net_carb_g=data['net_carb_intake'], net_carb_intake=data['net_carb_intake'].transform(lambda x: x*ACF_C), fat_g=data['fat_intake'], fat_intake=data['fat_intake'].transform(lambda x: x*ACF_F), net_intake=data['net_intake']))
-    ma_cds_static = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], kcal_intake=data['kcal_intake'], tdee=data['tdee'], protein_g=data['protein_intake'], protein_intake=data['protein_intake'].transform(lambda x: x*ACF_P), net_carb_g=data['net_carb_intake'], net_carb_intake=data['net_carb_intake'].transform(lambda x: x*ACF_C), fat_g=data['fat_intake'], fat_intake=data['fat_intake'].transform(lambda x: x*ACF_F), net_intake=data['net_intake']))
+    ma_cds_working = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], kcal_intake=data['kcal_intake'], tdee=data['tdee'], protein_g=data['protein_intake'], protein_intake=data['protein_intake'].transform(lambda x: x*ACF_P), net_carb_g=data['net_carb_intake'], net_carb_intake=data['net_carb_intake'].transform(lambda x: x*ACF_C), carb_g=data['carb_intake'], fat_g=data['fat_intake'], fat_intake=data['fat_intake'].transform(lambda x: x*ACF_F), net_intake=data['net_intake'], fiber_g=data['fiber_intake']))
+    ma_cds_static = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], kcal_intake=data['kcal_intake'], tdee=data['tdee'], protein_g=data['protein_intake'], protein_intake=data['protein_intake'].transform(lambda x: x*ACF_P), net_carb_g=data['net_carb_intake'], net_carb_intake=data['net_carb_intake'].transform(lambda x: x*ACF_C), carb_g=data['carb_intake'], fat_g=data['fat_intake'], fat_intake=data['fat_intake'].transform(lambda x: x*ACF_F), net_intake=data['net_intake'], fiber_g=data['fiber_intake']))
 
     y_fudge = 1.1
     y_r_upper = max(ma_cds_working.data['kcal_intake'].max()*y_fudge,ma_cds_working.data['tdee'].max()*y_fudge)
@@ -69,13 +69,23 @@ def diet_figs(data, height=500, width=1200):
     plot_composition.legend.location = "top_left"
     plot_composition.legend.click_policy="hide"
 
-    div = Div(text="poop")
+    div_days = Div()
+    div_avg_intake = Div()
+    div_tdee = Div()
+    div_avg_net = Div()
+    div_avg_protein = Div()
+    div_avg_fat = Div()
+    div_avg_carb_all = Div()
+    div_avg_carb_net = Div()
+    div_avg_carb_fiber = Div()
+    div_problem_days = Div()
+    div_volatility = Div()
 
     ma_cb = CustomJS(args=dict(w=ma_cds_working, s=ma_cds_static), code=MA_SLIDER_CODE)
 
-    plot_comparison.x_range.callback = CustomJS(args=dict(d=div), code=STATS_CODE)
+    plot_comparison.x_range.callback = CustomJS(args=dict(d_d=div_days, d_a_i=div_avg_intake, d_t=div_tdee, d_a_n=div_avg_net, d_a_p=div_avg_protein, d_a_f=div_avg_fat, d_a_c_a=div_avg_carb_all, d_a_c_n=div_avg_carb_net, d_a_c_f=div_avg_carb_fiber, d_p_d=div_problem_days, d_v=div_volatility, s=ma_cds_static), code=STATS_CODE)
     ma_slider = Slider(start=1, end=30, value=7, step=1, title="Moving Average", callback=ma_cb)
-    return components((div, plot_comparison, plot_composition, ma_slider))
+    return components((div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison, plot_composition, ma_slider))
 
 def diet_stats(data):
     stats = {}

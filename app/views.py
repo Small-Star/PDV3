@@ -27,8 +27,8 @@ def body():
 def diet():
     q = QS_Params.query.filter(QS_Params.kcal_intake >= 0)
     data = pd.read_sql(q.statement, q.session.bind)
-    stats, script, div, plot_comparison_div, plot_composition_div, ma_slider_div = graph_diet.diet_graph(data)
-    return render_template("diet.html",data=data, script=script, div=div, plot_composition_div=plot_composition_div, plot_comparison_div=plot_comparison_div, ma_slider_div=ma_slider_div, stats=stats, title="DIET")
+    stats, script, div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison_div, plot_composition_div, ma_slider_div = graph_diet.diet_graph(data)
+    return render_template("diet.html",data=data, script=script, div_days=div_days, div_avg_intake=div_avg_intake, div_tdee=div_tdee, div_avg_net=div_avg_net, div_avg_protein=div_avg_protein, div_avg_fat=div_avg_fat, div_avg_carb_all=div_avg_carb_all, div_avg_carb_net=div_avg_carb_net, div_avg_carb_fiber=div_avg_carb_fiber, div_problem_days=div_problem_days, div_volatility=div_volatility, plot_composition_div=plot_composition_div, plot_comparison_div=plot_comparison_div, ma_slider_div=ma_slider_div, stats=stats, title="DIET")
 
 @app.route("/weightlifting")
 def weightlifting():

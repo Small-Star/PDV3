@@ -88,21 +88,21 @@ function array_avg(a){
     return array_sum(a)/a.length
 }
 
-div_days.text = culled_vals['date'].length.toString()
-div_avg_intake.text = array_avg(culled_vals['kcal_intake']).toFixed(0).toString()
-div_tdee.text = array_avg(culled_vals['tdee']).toFixed(0).toString()
-div_avg_net.text = array_avg(culled_vals['net_intake']).toFixed(0).toString()
-div_avg_protein.text = array_avg(culled_vals['protein_g']).toFixed(1).toString()
-div_avg_fat.text = array_avg(culled_vals['fat_g']).toFixed(1).toString()
-div_avg_carb_all.text = array_avg(culled_vals['carb_g']).toFixed(1).toString()
-div_avg_carb_net.text = array_avg(culled_vals['net_carb_g']).toFixed(1).toString()
-div_avg_carb_fiber.text = array_avg(culled_vals['fiber_g']).toFixed(1).toString()
+div_days.text = culled_vals['date'].length.toString();
+div_avg_intake.text = array_avg(culled_vals['kcal_intake']).toFixed(0).toString();
+div_tdee.text = array_avg(culled_vals['tdee']).toFixed(0).toString();
+div_avg_net.text = array_avg(culled_vals['net_intake']).toFixed(0).toString();
+div_avg_protein.text = array_avg(culled_vals['protein_g']).toFixed(1).toString();
+div_avg_fat.text = array_avg(culled_vals['fat_g']).toFixed(1).toString();
+div_avg_carb_all.text = array_avg(culled_vals['carb_g']).toFixed(1).toString();
+div_avg_carb_net.text = array_avg(culled_vals['net_carb_g']).toFixed(1).toString();
+div_avg_carb_fiber.text = array_avg(culled_vals['fiber_g']).toFixed(1).toString();
 div_problem_days.text = culled_vals['kcal_intake'].filter(function(kci){return(kci > 4000)}).length.toString();
 
 //TODO: Implememt
-div_volatility.text = "TODO"
+div_volatility.text = "TODO";
 
-div_days.change.emit()
+div_days.change.emit();
 div_avg_intake.change.emit();
 div_tdee.change.emit();
 div_avg_net.change.emit();

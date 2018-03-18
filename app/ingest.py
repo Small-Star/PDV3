@@ -8,7 +8,7 @@ from collections import namedtuple
 
 Mood_Tup = namedtuple('Mood_Tup', 'date a_l a_u a_s v_l v_u v_s')
 Diet_Tup = namedtuple('Diet_Tup', 'date kcal_intake intake_error_bar protein_intake protein_intake_error_bar carb_intake net_carb_intake tdee tdee_error_bar cycle_phase cycle_num')
-Diet_Tup.__new__.__defaults__ = (-1,) * len(Diet_Tup._fields)
+#Diet_Tup.__new__.__defaults__ = (-1,) * len(Diet_Tup._fields)
 Rhr_Tup = namedtuple('Rhr_Tup', 'date rhr_time bpm')
 Sleep_Tup = namedtuple('Sleep_Tup', 'date sleep_onset sleep_duration sleep_how_much_more sleep_how_deep sleep_interruptions sleep_overall_q sleep_notes')
 Blood_Tup = namedtuple('Blood_Tup', 'date glucose_time glucose ketones_time ketones blood_notes')
@@ -104,10 +104,10 @@ def ingest_diet(date=""):
                 self.cycle_phase = re.search(self.fic_re,data[-2::]).group()     #Pulls out the endmost non-whitespace character(s)
 
                 #TDEEs are always the end of an entry; push the tuple to the to_add list
-                self.to_add.append(Diet_Tup(date=self.date, kcal_intake=self.kcal_intake, intake_error_bar=self.intake_error_bar, protein_intake=self.protein_intake, protein_intake_error_bar=self.protein_intake_error_bar, carb_intake=self.carb_intake, net_carb_intake=self.net_carb_intake, tdee=self.tdee, cycle_phase=self.cycle_phase)) #Pull in the rest later
+                self.to_add.append(Diet_Tup(date=self.date, kcal_intake=self.kcal_intake, intake_error_bar=self.intake_error_bar, protein_intake=self.protein_intake, protein_intake_error_bar=self.protein_intake_error_bar, carb_intake=self.carb_intake, net_carb_intake=self.net_carb_intake, tdee=self.tdee, tdee_error_bar="", cycle_phase=self.cycle_phase, cycle_num=0)) #Pull in the rest later
 
                 #Reset vals
-                self.date, self.kcal_intake, self.intake_error_bar, self.protein_intake, self.protein_intake_error_bar, self.carb_intake, self.net_carb_intake, self.tdee, self.cycle_phase, self.cycle_num = datetime.date(2100,1,1), -1, -1, -1, -1, -1, -1, -1, "", -1
+                self.date, self.kcal_intake, self.intake_error_bar, self.protein_intake, self.protein_intake_error_bar, self.carb_intake, self.net_carb_intake, self.tdee, self.cycle_phase, self.cycle_num = datetime.date(2100,1,1), 0, 0, 0, 0, 0, 0, 0, "", 0
 
         def get_diets(self):
             return self.to_add

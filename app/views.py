@@ -15,8 +15,8 @@ def index():
 def mood():
     q = Mood.query.filter(Mood.date != None)
     data = pd.read_sql(q.statement, q.session.bind)
-    stats, script, plot_ts_div, plot_vr_div, ma_slider_div = graph_mood.mood_graph(data)
-    return render_template("mood.html",data=data, script=script, plot_ts_div=plot_ts_div, plot_vr_div=plot_vr_div, ma_slider_div=ma_slider_div, stats=stats, title="MOOD")
+    stats, script, div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts_div, plot_vr_div, ma_slider_div = graph_mood.mood_graph(data)
+    return render_template("mood.html",data=data, script=script, div_days=div_days, div_avg_a=div_avg_a, div_avg_v=div_avg_v, div_good_days=div_good_days, div_poor_days=div_poor_days, div_caution_days=div_caution_days, div_warning_days=div_warning_days, plot_ts_div=plot_ts_div, plot_vr_div=plot_vr_div, ma_slider_div=ma_slider_div, stats=stats, title="MOOD")
 
 @app.route("/body")
 def body():

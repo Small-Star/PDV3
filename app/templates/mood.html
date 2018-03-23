@@ -48,11 +48,13 @@
         <h3 class="panel-title">INFORMATION</h3></div>
     <div class="panel-body">
       <ul class="list-group">
-        <li class="list-group-item list-group-item-info"><b>Days:</b> {{ stats.days }}</li>
-        <li class="list-group-item"><b>Average A:</b> {{ stats.avg_a }}</li>
-        <li class="list-group-item"><b>Average V:</b> {{ stats.avg_v }}</li>
-        <li class="list-group-item"><b>Good Days:</b> {{ stats.num_good_days }}</li>
-        <li class="list-group-item"><b>Poor Days:</b> {{ stats.num_poor_days }}</li>
+        <li class="list-group-item list-group-item-info text-nowrap"><b>Days:</b> {{ div_days|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Average A:</b>{{ div_avg_a|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Average V:</b> {{ div_avg_v|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Good Days:</b>{{ div_good_days|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Poor Days:</b>{{ div_poor_days|safe }}</li>
+        <li class="list-group-item text-nowrap list-group-item-warning"><b>Caution Days:</b>{{ div_caution_days|safe }}</li>
+        <li class="list-group-item text-nowrap list-group-item-danger"><b>Warning Days:</b>{{ div_warning_days|safe }}</li>
       </ul>
 
 

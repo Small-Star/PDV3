@@ -1,8 +1,40 @@
 {% extends "base.html" %}
-{% block main_ctnt %}
-    <h1>Body</h1>
+{% block head_ctnt %}
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.js"></script>
+  {{ script|safe }}
 {% endblock %}
 
 {% block info_bar_ctnt %}
     <h3>INFORMATION</h3>
+{% endblock %}
+
+{% block main_ctnt %}
+<!-- Body Composition panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">BODY COMPOSITION</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_body_comp">
+  </div>
+  <div id="pan_body_comp" class="panel-body panel-collapse collapse in">
+    {{ plot_body_comp_div|safe }}
+  </div>
+</div>
+
+<!-- Misc panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">MISCELLANEOUS</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_misc">
+  </div>
+  <div id="pan_miscr" class="panel-body panel-collapse collapse in">
+    {{ plot_misc_div|safe }}
+  </div>
+</div>
 {% endblock %}

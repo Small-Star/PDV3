@@ -28,7 +28,7 @@ def ingest_mood(date=""):
             data_ = data.strip()    #Drop whitespace
 
             if re.match(self.date_str_re,data_) != None:
-                self.to_add.append(Mood_Tup(date = datetime.datetime.strptime(data_[:10],"%m/%d/%Y").date(), a_l = int(data_[14]), a_u = int(data_[16]), a_s = data_[17], v_l = int(data_[20]), v_u = int(data_[22]), v_s = data_[23]))
+                self.to_add.append(Mood_Tup(date = datetime.datetime.strptime(data_[:10],"%m/%d/%Y").date(), a_l = float(data_[14]), a_u = float(data_[16]), a_s = data_[17], v_l = float(data_[20]), v_u = float(data_[22]), v_s = data_[23]))
 
         def get_moods(self):
             return self.to_add

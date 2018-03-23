@@ -7,14 +7,14 @@ from bokeh.plotting import figure
 from bokeh.charts import Line
 from bokeh.embed import components
 from bokeh.models.sources import ColumnDataSource
+from bokeh.models.widgets import Div
 
 from helper_functions import *
 
 def mood_graph(data):
     '''Creates a Bokeh plot for mood data'''
 
-    cds_working = ColumnDataSource(data)
-    cds_static = ColumnDataSource(data)
+
     #TODO: This is messy; clean up
     # cleaned_data = {"date": [], "date_str": [],
     #     "a_l_working": [], "a_u_working": [], "a_be_working": [], "v_l_working": [], "v_u_working": [], "v_be_working": [],
@@ -41,12 +41,14 @@ def mood_graph(data):
 
     stats = mood_stats(data)
 
-    script_div, (plot_ts_div, plot_vr_div, ma_slider_div) = mood_figs(cds_working, cds_static)
+    script_div, (div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts_div, plot_vr_div, ma_slider_div) = mood_figs(data)
 
-    return stats, script_div, plot_ts_div, plot_vr_div, ma_slider_div
+    return stats, div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, script_div, plot_ts_div, plot_vr_div, ma_slider_div
 
 
-def mood_figs(cds_working, cds_static, height = 500, width = 1200):
+def mood_figs(data, height = 500, width = 1200):
+
+
 
     #Timeseries Plot
     wz = WheelZoomTool(dimensions='width')
@@ -55,6 +57,11 @@ def mood_figs(cds_working, cds_static, height = 500, width = 1200):
     wz,
     ResetTool(),
     SaveTool()]
+
+    data['date_str'] = data['date'].map(str)
+
+    cds_working = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], a_l=data['a_l'], a_u=data['a_u'], a_be=data['a_be'], v_l=data['v_l'], v_u=data['v_u'], v_be=data['v_be']))
+    cds_static = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], a_l=data['a_l'], a_u=data['a_u'], a_be=data['a_be'], v_l=data['v_l'], v_u=data['v_u'], v_be=data['v_be']))
 
     plot_ts = figure(x_axis_type="datetime", title="Mood (AV Circumplex Model)", h_symmetry=False, v_symmetry=False,
                   min_border=0, plot_height=height, plot_width=width, y_range=[1,9], toolbar_location="above", outline_line_color="#666666", tools=plot_ts_tools, active_scroll=wz)
@@ -115,42 +122,18 @@ def mood_figs(cds_working, cds_static, height = 500, width = 1200):
 
     plot_vr.oval('x','y','w','h',color='color', source=cds_working_2, alpha='alpha')
 
-    ma_cb = CustomJS(args=dict(w=cds_working, s=cds_static), code=MA_SLIDER_CODE)
-    #Moving Average Slider
-    # def ma_callback(source=source, window=None):
-    #     '''Callback for moving average filter'''
-    #     d = source.data
-    #     ma = cb_obj.value
-    #     a_l_working, a_l_static = d['a_l_working'], d['a_l_static']
-    #     a_u_working, a_u_static = d['a_u_working'], d['a_u_static']
-    #     a_be_working, a_be_static = d['a_be_working'], d['a_be_static']
-    #     v_l_working, v_l_static = d['v_l_working'], d['v_l_static']
-    #     v_u_working, v_u_static = d['v_u_working'], d['v_u_static']
-    #     v_be_working, v_be_static = d['v_be_working'], d['v_be_static']
-    #
-    #     for i in range(len(a_be_working)):
-    #         a_l_working[i], a_u_working[i], a_be_working[i], v_l_working[i], v_u_working[i], v_be_working[i] = 0, 0, 0, 0, 0, 0
-    #         r = min(ma,i)
-    #
-    #         for j in range(r):
-    #             a_l_working[i] += a_l_static[i-j]
-    #             a_u_working[i] += a_u_static[i-j]
-    #             a_be_working[i] += a_be_static[i-j]
-    #             v_l_working[i] += v_l_static[i-j]
-    #             v_u_working[i] += v_u_static[i-j]
-    #             v_be_working[i] += v_be_static[i-j]
-    #
-    #         a_l_working[i] = float(a_l_working[i]/r)
-    #         a_u_working[i] = float(a_u_working[i]/r)
-    #         a_be_working[i] = float(a_be_working[i]/r)
-    #         v_l_working[i] = float(v_l_working[i]/r)
-    #         v_u_working[i] = float(v_u_working[i]/r)
-    #         v_be_working[i] = float(v_be_working[i]/r)
-    #
-    #     source.change.emit()
+    div_days = Div()
+    div_avg_a = Div()
+    div_avg_v = Div()
+    div_good_days = Div()
+    div_poor_days = Div()
+    div_caution_days = Div()
+    div_warning_days = Div()
 
+    ma_cb = CustomJS(args=dict(w=cds_working, s=cds_static), code=MA_SLIDER_CODE)
+    plot_ts.x_range.callback = CustomJS(args=dict(d_d=div_days, d_avg_a=div_avg_a, d_avg_v=div_avg_v, d_g_d=div_good_days, d_p_d=div_poor_days, d_c_d=div_caution_days, d_w_d=div_warning_days, s=cds_static), code=MOOD_STATS_CODE)
     ma_slider = Slider(start=1, end=30, value=1, step=1, title="Moving Average", callback=ma_cb)
-    return components((plot_ts, plot_vr, ma_slider))
+    return components((div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts, plot_vr, ma_slider))
 
 def mood_stats(data):
     stats = {}

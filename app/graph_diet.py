@@ -83,7 +83,7 @@ def diet_figs(data, height=500, width=1200):
 
     ma_cb = CustomJS(args=dict(w=ma_cds_working, s=ma_cds_static), code=MA_SLIDER_CODE)
 
-    plot_comparison.x_range.callback = CustomJS(args=dict(d_d=div_days, d_a_i=div_avg_intake, d_t=div_tdee, d_a_n=div_avg_net, d_a_p=div_avg_protein, d_a_f=div_avg_fat, d_a_c_a=div_avg_carb_all, d_a_c_n=div_avg_carb_net, d_a_c_f=div_avg_carb_fiber, d_p_d=div_problem_days, d_v=div_volatility, s=ma_cds_static), code=STATS_CODE)
+    plot_comparison.x_range.callback = CustomJS(args=dict(d_d=div_days, d_a_i=div_avg_intake, d_t=div_tdee, d_a_n=div_avg_net, d_a_p=div_avg_protein, d_a_f=div_avg_fat, d_a_c_a=div_avg_carb_all, d_a_c_n=div_avg_carb_net, d_a_c_f=div_avg_carb_fiber, d_p_d=div_problem_days, d_v=div_volatility, s=ma_cds_static), code=DIET_STATS_CODE)
     ma_slider = Slider(start=1, end=30, value=7, step=1, title="Moving Average", callback=ma_cb)
     return components((div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison, plot_composition, ma_slider))
 

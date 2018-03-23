@@ -75,11 +75,11 @@ class Mood(db.Model):
     __tablename__ = 'mood'
     date = db.Column(db.Date, db.ForeignKey('qs_params.date'), index=True, unique=True, primary_key=True)
     qsp = db.relationship("QS_Params", back_populates="mood")
-    a_l = db.Column(db.Integer)
-    a_u = db.Column(db.Integer)
+    a_l = db.Column(db.Float)
+    a_u = db.Column(db.Float)
     a_s = db.Column(db.String(length=1))
-    v_l = db.Column(db.Integer)
-    v_u = db.Column(db.Integer)
+    v_l = db.Column(db.Float)
+    v_u = db.Column(db.Float)
     v_s = db.Column(db.String(length=1))
 
     a_be = db.Column(db.Integer)

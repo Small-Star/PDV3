@@ -43,7 +43,7 @@ def mood_graph(data):
 
     script_div, (div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts_div, plot_vr_div, ma_slider_div) = mood_figs(data)
 
-    return stats, div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, script_div, plot_ts_div, plot_vr_div, ma_slider_div
+    return stats, script_div, div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts_div, plot_vr_div, ma_slider_div
 
 
 def mood_figs(data, height = 500, width = 1200):

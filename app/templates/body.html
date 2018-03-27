@@ -11,11 +11,19 @@
   {{ script|safe }}
 {% endblock %}
 
-{% block info_bar_ctnt %}
-    <h3>INFORMATION</h3>
-{% endblock %}
-
 {% block main_ctnt %}
+
+<!-- Biomarkers panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">BIOMARKERS</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_biomarkers">
+  </div>
+  <div id="pan_miscr" class="panel-body panel-collapse collapse in">
+    {{ plot_biomarkers_div|safe }}
+  </div>
+</div>
+
 <!-- Body Composition panel -->
 <div class="panel panel-primary">
   <div class="panel-heading">
@@ -27,14 +35,37 @@
   </div>
 </div>
 
-<!-- Misc panel -->
+<!-- Sleep panel -->
 <div class="panel panel-primary">
   <div class="panel-heading">
-    <h3 class="panel-title">MISCELLANEOUS</h3>
-    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_misc">
+    <h3 class="panel-title">SLEEP</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_sleep">
   </div>
   <div id="pan_miscr" class="panel-body panel-collapse collapse in">
-    {{ plot_misc_div|safe }}
+    {{ plot_sleep_div|safe }}
   </div>
 </div>
+{% endblock %}
+
+
+{% block info_bar_ctnt %}
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">CONTROL</h3></div>
+  <div class="panel-body">
+      {{ ma_slider_div|safe }}
+    </div>
+  </div>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">INFORMATION</h3></div>
+    <div class="panel-body">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-info text-nowrap"><b>Days:</b> {{ div|safe }}</li>
+
+      </ul>
+
+      </div>
+    </div>
+
 {% endblock %}

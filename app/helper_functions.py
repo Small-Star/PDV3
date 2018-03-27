@@ -171,7 +171,7 @@ div_avg_v.text = array_avg(culled_vals['v_be']).toFixed(2).toString();
 div_good_days.text = culled_vals['v_be'].filter(function(val){return(val >= 6)}).length.toString();
 div_poor_days.text = culled_vals['v_be'].filter(function(val){return(val <= 4)}).length.toString();
 div_caution_days.text = culled_vals['v_be'].filter(function(val){return(val <= 3.5)}).length.toString();
-div_warning_days.text = culled_vals['v_l'].filter(function(val){return(val <= 2.1)}).length.toString();
+div_warning_days.text = culled_vals['v_l'].filter(function(val){return(val <= 2)}).length.toString();
 
 div_days.change.emit();
 div_avg_a.change.emit();
@@ -180,5 +180,55 @@ div_good_days.change.emit();
 div_poor_days.change.emit();
 div_caution_days.change.emit();
 div_warning_days.change.emit();
+
+""")
+
+BODY_STATS_CODE = ("""
+
+var s_d = s.data
+var culled_vals = Object.assign({},s.data)
+
+var div_days = d_d;
+
+
+//Beginning and end of currently selected x_range
+var end = new Date(Number(cb_obj.end.toString()));
+var beg = new Date(Number(cb_obj.start.toString()));
+
+//Clear values
+cn = s.column_names
+for (h = 0; h < cn.length; h++) {
+    culled_vals[cn[h]] = []
+    }
+
+//Read in values of the dates in the currently selected x_range
+//***TODO: Probably some efficiency gains here...
+for (i = 0; i < s_d['date'].length; i++) {
+    if(s_d['date'][i] >= beg && s_d['date'][i] <= end){
+        for (j = 0; j < cn.length; j++) {
+            //if (!isNaN(s_d[cn[j]][i])){
+                culled_vals[cn[j]].push(s_d[cn[j]][i])
+            //}
+        }
+    }
+}
+
+function array_sum(a){
+var s = 0
+    for (h = 0; h < a.length; h++) {
+    s += a[h]
+    }
+    return s
+}
+
+function array_avg(a){
+    return array_sum(a)/a.length
+}
+
+div_days.text = culled_vals['date'].length.toString();
+
+
+div_days.change.emit();
+
 
 """)

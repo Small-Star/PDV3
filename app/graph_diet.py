@@ -15,11 +15,9 @@ from config import *
 def diet_graph(data):
     '''Creates Bokeh plots for diet related information'''
 
-    stats = diet_stats(data)
-
     script_div, (div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison_div, plot_composition_div, ma_slider_div) = diet_figs(data)
 
-    return stats, script_div, div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison_div, plot_composition_div, ma_slider_div
+    return script_div, div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison_div, plot_composition_div, ma_slider_div
 
 def diet_figs(data, height=500, width=1200):
 
@@ -86,17 +84,3 @@ def diet_figs(data, height=500, width=1200):
     plot_comparison.x_range.callback = CustomJS(args=dict(d_d=div_days, d_a_i=div_avg_intake, d_t=div_tdee, d_a_n=div_avg_net, d_a_p=div_avg_protein, d_a_f=div_avg_fat, d_a_c_a=div_avg_carb_all, d_a_c_n=div_avg_carb_net, d_a_c_f=div_avg_carb_fiber, d_p_d=div_problem_days, d_v=div_volatility, s=ma_cds_static), code=DIET_STATS_CODE)
     ma_slider = Slider(start=1, end=30, value=7, step=1, title="Moving Average", callback=ma_cb)
     return components((div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison, plot_composition, ma_slider))
-
-def diet_stats(data):
-    stats = {}
-    stats['days'] = len(data['date'])
-    stats['avg_intake'] = round(data['kcal_intake'].mean(),2)
-    stats['avg_tdee'] = round(data['tdee'].mean())
-    stats['avg_net'] = round(data['net_intake'].mean())
-    stats['avg_protein'] = round(data['protein_intake'].mean())
-    stats['avg_fat'] = round(data['fat_intake'].mean())
-    stats['avg_carb'] = round(data['carb_intake'].mean())
-    stats['avg_net_carb'] = round(data['net_carb_intake'].mean())
-    stats['avg_fiber'] = round(data['fiber_intake'].mean())
-    stats['problem_days'] = sum(data['kcal_intake'].gt(4000))
-    return stats

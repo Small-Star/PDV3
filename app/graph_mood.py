@@ -39,11 +39,11 @@ def mood_graph(data):
     #
     # df = pd.DataFrame(cleaned_data, columns = ['date','date_str', 'a_l_working', 'a_u_working', 'a_be_working', 'v_l_working', 'v_u_working', 'v_be_working', 'a_l_static', 'a_u_static', 'a_be_static', 'v_l_static', 'v_u_static', 'v_be_static'])
 
-    stats = mood_stats(data)
+
 
     script_div, (div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts_div, plot_vr_div, ma_slider_div) = mood_figs(data)
 
-    return stats, script_div, div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts_div, plot_vr_div, ma_slider_div
+    return script_div, div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts_div, plot_vr_div, ma_slider_div
 
 
 def mood_figs(data, height = 500, width = 1200):
@@ -134,12 +134,3 @@ def mood_figs(data, height = 500, width = 1200):
     plot_ts.x_range.callback = CustomJS(args=dict(d_d=div_days, d_avg_a=div_avg_a, d_avg_v=div_avg_v, d_g_d=div_good_days, d_p_d=div_poor_days, d_c_d=div_caution_days, d_w_d=div_warning_days, s=cds_static), code=MOOD_STATS_CODE)
     ma_slider = Slider(start=1, end=30, value=1, step=1, title="Moving Average", callback=ma_cb)
     return components((div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts, plot_vr, ma_slider))
-
-def mood_stats(data):
-    stats = {}
-    stats['days'] = len(data['date'])
-    stats['avg_a'] = round(data['a_be'].mean(),2)
-    stats['avg_v'] = round(data['v_be'].mean(),2)
-    stats['num_good_days'] = len([_ for _ in data['v_be'] if _ >= 6])
-    stats['num_poor_days'] = len([_ for _ in data['v_be'] if _ <= 4])
-    return stats

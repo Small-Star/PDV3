@@ -15,8 +15,8 @@ from config import *
 def body_graph(data):
     '''Creates Bokeh plots for diet related information'''
 
-    script_div, (div, plot_body_comp_div, plot_misc_div, plot_sleep_div, ma_slider_div) = body_figs(data)
-    return script_div, div, plot_body_comp_div, plot_misc_div, plot_sleep_div, ma_slider_div
+    script_div, (div, plot_blood_div, plot_rhr_div, plot_osq_div, plot_body_comp_div, plot_sleep_div, ma_slider_div) = body_figs(data)
+    return script_div, div, plot_blood_div, plot_rhr_div, plot_osq_div, plot_body_comp_div, plot_sleep_div, ma_slider_div
 
 def body_figs(data, height=500, width=1200):
 
@@ -24,7 +24,7 @@ def body_figs(data, height=500, width=1200):
 
 
     wz = WheelZoomTool(dimensions='width')
-    plt_biomarkers_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("RHR", "@bpm"), ("Sleep Quality", "@sleep_overall_q"), ("Blood Glucose", "@glucose"), ("Blood Ketones", "@ketones")],names=["bpm"],mode='vline'),
+    plt_biomarkers_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("RHR", "@bpm"), ("Sleep Quality", "@sleep_overall_q"), ("Blood Glucose", "@glucose"), ("Blood Ketones", "@ketones")],names=["bpm", "glucose"],mode='vline'),
     PanTool(dimensions='width'),
     wz,
     ResetTool(),
@@ -51,24 +51,39 @@ def body_figs(data, height=500, width=1200):
     # y_r_upper = max(ma_cds_working.data['kcal_intake'].max()*y_fudge,ma_cds_working.data['tdee'].max()*y_fudge)
     # y_r_lower = ma_cds_working.data['net_intake'].min()*y_fudge
 
-    plot_biomarkers = figure(x_axis_type="datetime", title="Biomarkers (Various)", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=height, plot_width=width, toolbar_location="above", outline_line_color="#666666", tools=plt_biomarkers_tools, active_scroll=wz)
+    plot_blood = figure(x_axis_type="datetime", title="Biomarkers (Various)", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=height, y_range=[40, 140], plot_width=int(width/2 - 50), toolbar_location="above", outline_line_color="#666666", tools=plt_biomarkers_tools, active_scroll=wz)
 
-    plot_biomarkers.line('date', 'bpm', name="bpm", source=ma_cds_working, line_color="#8B0A50", line_width=3, line_alpha=0.6, legend="RHR")
-    plot_biomarkers.line('date', 'sleep_overall_q', source=ma_cds_working, line_color="#333366", line_width=3, line_alpha=0.6, legend="Sleep Quality")
-    plot_biomarkers.line('date', 'glucose', source=ma_cds_working, line_color="#FF7700", line_width=3, line_alpha=0.6, legend="Blood Glucose")
-    plot_biomarkers.line('date', 'ketones', source=ma_cds_working, line_color="#C74D56", line_width=3, line_alpha=0.6, legend="Blood Ketones")
-    plot_biomarkers.legend.location = "top_left"
-    plot_biomarkers.legend.click_policy="hide"
 
-    plot_composition = figure(x_axis_type="datetime", title="Body Composition", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=height, plot_width=width, x_range=plot_biomarkers.x_range, toolbar_location="above", outline_line_color="#666666", tools=plt_bcomp_tools, active_scroll=wz2)
+    plot_blood.extra_y_ranges = {"ketones_range": Range1d(start=0, end=7)}
+    plot_blood.add_layout(LinearAxis(y_range_name="ketones_range"), 'right')
+
+    plot_blood.line('date', 'glucose', name="glucose", source=ma_cds_working, line_color="#FF7700", line_width=3, line_alpha=0.6, legend="Blood Glucose")
+    plot_blood.cross('date', 'ketones', source=ma_cds_working, line_color="#C74D56", line_alpha=0.6, legend="Blood Ketones", y_range_name="ketones_range")
+    plot_blood.ray(x=data['date'][1195],y=.5, length=0, angle=0, line_color="#C74D56", line_width=1, y_range_name="ketones_range")
+    plot_blood.ray(x=data['date'][1195],y=1, length=0, angle=0, line_color="#C74D56", line_width=1, y_range_name="ketones_range")
+    plot_blood.legend.location = "top_left"
+    plot_blood.legend.click_policy="hide"
+
+    plot_rhr = figure(x_axis_type="datetime", title="Morning Resting HR", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=int(height/2), plot_width=int(width/2),  x_range=plot_blood.x_range, outline_line_color="#666666")
+    plot_rhr.line('date', 'bpm', name="bpm", source=ma_cds_working, line_color="#8B0A50", line_width=3, line_alpha=0.6)
+    plot_rhr.toolbar_location = None
+
+    plot_osq = figure(x_axis_type="datetime", title="Overall Sleep Quality", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=int(height/2), plot_width=int(width/2),  y_range=[1, 9], x_range=plot_blood.x_range, outline_line_color="#666666")
+    plot_osq.line('date', 'sleep_overall_q', source=ma_cds_working, line_color="#333366", line_width=3, line_alpha=0.6)
+    plot_osq.toolbar_location = None
+
+    plot_composition = figure(x_axis_type="datetime", title="Body Composition", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=height, plot_width=width, x_range=plot_blood.x_range, toolbar_location="above", outline_line_color="#666666", tools=plt_bcomp_tools, active_scroll=wz2)
 
     plot_composition.legend.location = "top_left"
     plot_composition.legend.click_policy="hide"
 
-    plot_sleep = figure(x_axis_type="datetime", title="Sleep", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=height, plot_width=width, x_range=plot_biomarkers.x_range, toolbar_location="above", outline_line_color="#666666", tools=plt_sleep_tools, active_scroll=wz3)
+    plot_sleep = figure(x_axis_type="datetime", title="Sleep", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=height, plot_width=width, y_range=[1,9], x_range=plot_blood.x_range, toolbar_location="above", outline_line_color="#666666", tools=plt_sleep_tools, active_scroll=wz3)
+
+    plot_sleep.extra_y_ranges = {"sleep_range": Range1d(start=0, end=12)}
+    plot_sleep.add_layout(LinearAxis(y_range_name="sleep_range"), 'right')
 
     plot_sleep.line('date', 'sleep_overall_q', name='sleep_overall_q', source=ma_cds_working, line_color="#8B0A50", line_width=2, line_alpha=0.6, legend="Sleep Quality")
-    plot_sleep.line('date', 'sleep_duration', source=ma_cds_working, line_color="#333366", line_width=2, line_alpha=0.6, legend="Duration (hrs)")
+    plot_sleep.line('date', 'sleep_duration', source=ma_cds_working, line_color="#333366", line_width=2, line_alpha=0.6, legend="Duration (hrs)", y_range_name="sleep_range")
     plot_sleep.line('date', 'sleep_how_much_more', source=ma_cds_working, line_color="#FF7700", line_width=2, line_alpha=0.6, legend="Satisfaction")
     plot_sleep.line('date', 'sleep_how_deep', source=ma_cds_working, line_color="#C74D56", line_width=2, line_alpha=0.6, legend="Depth")
     plot_sleep.line('date', 'sleep_interruptions', source=ma_cds_working, line_color="#0a8b45", line_width=2, line_alpha=0.6, legend="Interruptions")
@@ -78,6 +93,6 @@ def body_figs(data, height=500, width=1200):
 
     ma_cb = CustomJS(args=dict(w=ma_cds_working, s=ma_cds_static), code=MA_SLIDER_CODE)
     div = Div()
-    plot_biomarkers.x_range.callback = CustomJS(args=dict(d_d=div, s=ma_cds_static), code=BODY_STATS_CODE)
+    plot_blood.x_range.callback = CustomJS(args=dict(d_d=div, s=ma_cds_static), code=BODY_STATS_CODE)
     ma_slider = Slider(start=1, end=30, value=7, step=1, title="Moving Average", callback=ma_cb)
-    return components((div, plot_biomarkers, plot_composition, plot_sleep, ma_slider))
+    return components((div, plot_blood, plot_rhr, plot_osq, plot_composition, plot_sleep, ma_slider))

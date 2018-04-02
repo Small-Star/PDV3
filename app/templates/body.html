@@ -19,8 +19,20 @@
     <h3 class="panel-title">BIOMARKERS</h3>
     <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_biomarkers">
   </div>
-  <div id="pan_miscr" class="panel-body panel-collapse collapse in">
-    {{ plot_biomarkers_div|safe }}
+  <div id="pan_biomarkers" class="container panel-body panel-collapse collapse in">
+
+    <div class="row">
+      <div class="col-sm-6">
+
+    {{ plot_blood_div|safe }}
+  </div>
+  <div class="col-sm-6">
+        <div class="row"> {{ plot_rhr_div|safe }}             </div>
+              <div class="row">{{ plot_osq_div|safe }}
+
+              </div>
+  </div>
+  </div>
   </div>
 </div>
 
@@ -32,6 +44,7 @@
   </div>
   <div id="pan_body_comp" class="panel-body panel-collapse collapse in">
     {{ plot_body_comp_div|safe }}
+
   </div>
 </div>
 
@@ -41,7 +54,7 @@
     <h3 class="panel-title">SLEEP</h3>
     <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_sleep">
   </div>
-  <div id="pan_miscr" class="panel-body panel-collapse collapse in">
+  <div id="pan_sleep" class="panel-body panel-collapse collapse in">
     {{ plot_sleep_div|safe }}
   </div>
 </div>

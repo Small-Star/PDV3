@@ -4,23 +4,26 @@ var wd = w.data
 var sd = s.data
 var ma = cb_obj.value
 var r = 0
-
 cn = w.column_names
 for (h = 0; h < cn.length; h++) {
-
     working = wd[cn[h]]
     static = sd[cn[h]]
-
     if ((cn[h] == 'date') || (cn[h] == 'date_str')){
         working = Object.assign({},static)
         continue;
     }
-
-
-
     for (i = 0;  i < working.length; i++){
         working[i] = 0
         r = Math.min(ma,i)
+
+        for (k = 0; k < r; k++){
+        //Change moving average window when previous data isn't all present
+            if(isNaN(static[i-k])){
+            r=k;
+            break;
+            }
+        }
+
         for (j = 0; j < r; j++){
             working[i] += static[i-j]
         }
@@ -28,8 +31,8 @@ for (h = 0; h < cn.length; h++) {
     }
 }
 w.change.emit();
-
 """)
+
 
 DIET_STATS_CODE = ("""
 

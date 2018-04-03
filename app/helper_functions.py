@@ -192,7 +192,10 @@ var s_d = s.data
 var culled_vals = Object.assign({},s.data)
 
 var div_days = d_d;
-
+var div_avg_bg = d_a_bg;
+var div_avg_rhr = d_a_r;
+var div_avg_slp_dur = d_a_s_d;
+var div_avg_slp_q = d_a_s_q;
 
 //Beginning and end of currently selected x_range
 var end = new Date(Number(cb_obj.end.toString()));
@@ -209,9 +212,9 @@ for (h = 0; h < cn.length; h++) {
 for (i = 0; i < s_d['date'].length; i++) {
     if(s_d['date'][i] >= beg && s_d['date'][i] <= end){
         for (j = 0; j < cn.length; j++) {
-            //if (!isNaN(s_d[cn[j]][i])){
+            if (!isNaN(s_d[cn[j]][i])){
                 culled_vals[cn[j]].push(s_d[cn[j]][i])
-            //}
+            }
         }
     }
 }
@@ -229,9 +232,15 @@ function array_avg(a){
 }
 
 div_days.text = culled_vals['date'].length.toString();
-
+div_avg_bg.text = array_avg(culled_vals['glucose']).toFixed(0).toString();
+div_avg_rhr.text = array_avg(culled_vals['bpm']).toFixed(0).toString();
+div_avg_slp_dur.text = array_avg(culled_vals['sleep_duration']).toFixed(2).toString();
+div_avg_slp_q.text = array_avg(culled_vals['sleep_overall_q']).toFixed(0).toString();
 
 div_days.change.emit();
-
+div_avg_bg.change.emit();
+div_avg_rhr.change.emit();
+div_avg_slp_dur.change.emit();
+div_avg_slp_q.change.emit();
 
 """)

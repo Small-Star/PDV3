@@ -12,6 +12,8 @@ Diet_Tup = namedtuple('Diet_Tup', 'date kcal_intake intake_error_bar protein_int
 Rhr_Tup = namedtuple('Rhr_Tup', 'date rhr_time bpm')
 Sleep_Tup = namedtuple('Sleep_Tup', 'date sleep_onset sleep_duration sleep_how_much_more sleep_how_deep sleep_interruptions sleep_overall_q sleep_notes')
 Blood_Tup = namedtuple('Blood_Tup', 'date glucose_time glucose ketones_time ketones blood_notes')
+WL_Tup = namedtuple('WL_Tup', 'date start_time end_time weight bodyfat wo_rating wo_designation wo_notes')
+
 
 def ingest_mood(date=""):
     '''Reads data from MOOD_FILE and inputs it into db'''
@@ -58,8 +60,8 @@ def ingest_mood(date=""):
     ad = 0;
     for _ in t_a_:
         if Mood.query.get(_.date) == None:
-            #db.session.add(Mood(_.date,_.a_l,_.a_u,_.a_s,_.v_l,_.v_u,_.v_s))
-            db.session.add(Mood(_.date,_.a_l,_.a_u,_.a_s,_.v_l,_.v_u,_.v_s))
+            #db.session.merge(Mood(_.date,_.a_l,_.a_u,_.a_s,_.v_l,_.v_u,_.v_s))
+            db.session.merge(Mood(_.date,_.a_l,_.a_u,_.a_s,_.v_l,_.v_u,_.v_s))
             ad += 1
 
     logging.info("Ingested %s mood records; Validated %s mood records; Added %s mood records", str(len(t_a)), str(len(t_a_)), str(ad))
@@ -147,7 +149,7 @@ def ingest_diet(date=""):
     for _ in t_a_:
         if QS_Params.query.get(_.date) == None:
             q = QS_Params(_.date)
-            db.session.add(q)
+            db.session.merge(q)
 
         q = QS_Params.query.get(_.date)
         q.kcal_intake = _.kcal_intake
@@ -223,7 +225,7 @@ def ingest_rhr(date=""):
     for _ in t_a_:
         if QS_Params.query.get(_.date) == None:
             q = QS_Params(_.date)
-            db.session.add(q)
+            db.session.merge(q)
 
         q = QS_Params.query.get(_.date)
         q.rhr_time = _.rhr_time
@@ -303,7 +305,7 @@ def ingest_sleep(date=""):
     for _ in t_a_:
         if QS_Params.query.get(_.date) == None:
             q = QS_Params(_.date)
-            db.session.add(q)
+            db.session.merge(q)
 
         q = QS_Params.query.get(_.date)
         q.sleep_onset = _.sleep_onset
@@ -393,7 +395,7 @@ def ingest_blood(date=""):
     for _ in t_a_:
         if QS_Params.query.get(_.date) == None:
             q = QS_Params(_.date)
-            db.session.add(q)
+            db.session.merge(q)
 
         q = QS_Params.query.get(_.date)
         q.glucose_time = _.glucose_time
@@ -407,3 +409,128 @@ def ingest_blood(date=""):
     db.session.commit()
     logging.info("Ingested %s Blood records; Validated %s Blood records; Added %s Blood records", str(len(t_a)), str(len(t_a_)), str(ad))
     print("Blood Ingest complete")
+
+def ingest_weightlifting(date=""):
+    '''Reads data from WL_FILE and inputs it into db'''
+
+    class WL_HTML_Parser(HTMLParser):
+        ''' Input an xml file, return a list of tuples to add to the db'''
+        def __init__(self):
+            HTMLParser.__init__(self)
+
+            self.to_add = [] #List of tuples that will be returned for adding to the db
+            self.date, self.start_time, self.end_time, self.weight, self.bodyfat, self.wo_rating, self.wo_designation, self.wo_notes = datetime.date(2100,1,1), None, None, None, None, "", "", ""
+
+            self.corl_flag = 'L'                                            #Toggles cardio or lift
+
+            self.date_str_re = re.compile(r'\d\d\/\d\d\/\d\d')              #ex: '03/22/2014'
+            self.start_time_re = re.compile(r'Start Time - ')               #ex: 'Start Time - 01:23'
+            self.end_time_re = re.compile(r'End Time - ')                   #ex: 'End Time - 01:23'  note: optionally, there is a date subsequent to the time
+            self.weight_re = re.compile(r'Weight - ')
+            self.bodyfat_re = re.compile(r'Bodyfat - ')
+            self.type_re = re.compile(r'Workout: ')
+
+            self.cardio_flag_re = re.compile(r'Cardio:')
+            self.lifting_flag_re = re.compile(r'Lifting:')
+
+            self.rating_re = re.compile(r'Rating: ')
+            self.notes_re = re.compile(r'Notes: ')
+
+            self.lift_re = re.compile(r' - ')
+
+        def handle_data(self, data):
+            if re.match(self.date_str_re,data) != None:
+                self.to_add.append(WL_Tup(date=self.date, start_time=self.start_time, end_time=self.end_time, weight=self.weight, bodyfat=self.bodyfat, wo_rating=self.wo_rating, wo_designation=self.wo_designation, wo_notes=self.wo_notes))
+                self.date, self.start_time, self.end_time, self.weight, self.bodyfat, self.wo_rating, self.wo_designation, self.wo_notes = datetime.date(2100,1,1), None, None, None, None, "", "", ""
+                self.date = datetime.date(int(data[-5:-1]),int(data[:2]),int(data[3:5]))
+                #***STOPPED HERE***
+            # elif re.match(self.start_time_re,data) != None:
+            #     st_time = datetime.datetime(self.cr_date.year,self.cr_date.month,self.cr_date.day,int(data[13:15]),int(data[16:]))
+            #     self.lines.append((self.cr_date,'STARTTIME',st_time))
+            # elif re.match(self.end_time_re,data) != None:
+            #     e_time = datetime.datetime(int(data[23:]),int(data[17:19]),int(data[20:22]),int(data[11:13]),int(data[14:16]))
+            #     self.lines.append((self.cr_date,'ENDTIME',e_time))
+            elif re.match(self.weight_re,data) != None:
+                d = re.split('lbs',data[9:])[0]
+                if re.match('\d',d) != None:        #Check to make sure the weight is an actual value, and  is not N/A
+                    self.weight = float(d)
+            elif re.match(self.bodyfat_re,data) != None:
+                if data[-1:] == '%':     #Don't use bodyfats measured in mms; just drop those
+                    self.bodyfat = float(data[10:-1])
+            # elif re.match(self.type_re,data) != None:
+            #     self.lines.append((self.cr_date,'TYPE',data[9:]))
+            # elif re.match(self.cardio_flag_re,data) != None:
+            #     self.corl_flag = 'C'
+            # elif re.match(self.lifting_flag_re,data) != None:
+            #     self.corl_flag = 'L'
+            # elif re.match(self.rating_re,data) != None:
+            #     self.lines.append((self.cr_date,'RATING',data[8:]))
+            # elif re.match(self.notes_re,data) != None:
+            #     self.lines.append((self.cr_date,'NOTES',data[7:]))
+            #
+            # elif re.match(self.lift_re,data) != None:
+            #     if self.corl_flag == 'C':                       #Cardio
+            #         d = data.split(' - ')
+            #         self.lines.append((self.cr_date,'CARDIO',(d[1],d[-1])))   #tuple is type, duration (can be floors or minutes)
+            #     elif self.corl_flag == 'L':
+            #         d = data.split(' - ')           #Splits into '', Lift Name, Lifts
+            #         l = d[2].split(', ')            #Splits Lifts by csv
+            #         for el in l:
+            #             if len(el.split('x')) == 2: #This is not a multi-set lift
+            #                 self.lines.append((self.cr_date,'LIFT',(d[1],el)))                              #Appends a tuple of (Lift Name, Weightxrep)
+            #             elif len(el.split('x')) == 3: #This is a multi-set lift
+            #                 for x in range(int(re.split('[IF]',el.split('x')[-1])[0])):
+            #                     reconstituted_el = str(el.split('x')[0] + 'x' + el.split('x')[1])           #Make a number of entries corresponding to the third value
+            #                     self.lines.append((self.cr_date,'LIFT',(d[1],reconstituted_el)))            #Appends a tuple of (Lift Name, Weightxrep)
+
+
+        def get_lifts(self):
+            self.to_add.append(WL_Tup(date=self.date, start_time=self.start_time, end_time=self.end_time, weight=self.weight, bodyfat=self.bodyfat, wo_rating=self.wo_rating, wo_designation=self.wo_designation, wo_notes=self.wo_notes))
+            return self.to_add[1:]
+
+    #Validate
+    def val_lifts(wlt):
+        try:
+            assert type(wlt.date)==datetime.date and wlt.date >= datetime.date(2014,1,1), "date"
+            if wlt.weight != None:
+                assert wlt.weight > 100 and wlt.weight < 200, "weight"
+            if wlt.bodyfat != None:
+                assert wlt.bodyfat > 8 and wlt.bodyfat < 20, "bodyfat"
+            # if bt.ketones_time != None:
+            #     assert type(bt.ketones_time)==datetime.datetime, "ketones_time"
+            #     assert bt.ketones > 0 and bt.ketones < 9, "ketones"
+            # assert type(bt.blood_notes)==str, "blood_notes"
+            return wlt
+        except Exception as e:
+            logging.warning("Validation error in Weightlifting ingest for date " + str(wltt.date) + ": " + e.args[0])
+            return WL_Tup(date=datetime.date(2100,1,1), start_time=None, end_time=None, weight=None, bodyfat=None, wo_rating="", wo_designation="", wo_notes="")
+
+    WL_Parser = WL_HTML_Parser()
+    f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["WL_FILE"]), 'r')
+
+    #Read data
+    WL_Parser.feed(f_name.read())
+    t_a = WL_Parser.get_lifts()
+    t_a_ = [val_lifts(t) for t in t_a]
+
+    ad = 0
+    #Try and add entry to db
+    for _ in t_a_:
+        if QS_Params.query.get(_.date) == None:
+            q = QS_Params(_.date)
+            db.session.merge(q)
+
+        q = QS_Params.query.get(_.date)
+        q.start_time = _.start_time
+        q.end_time = _.end_time
+        q.weight = _.weight
+        q.bodyfat = _.bodyfat
+        q.wo_rating = _.wo_rating
+        q.wo_designation = _.wo_designation
+        q.wo_notes = _.wo_notes
+
+        ad += 1
+
+    db.session.commit()
+    logging.info("Ingested %s Weightlifting records; Validated %s Weightlifting records; Added %s Weightlifting records", str(len(t_a)), str(len(t_a_)), str(ad))
+    print("Weightlifting Ingest complete")

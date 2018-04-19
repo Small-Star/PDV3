@@ -3,7 +3,7 @@ from app import app, db
 from app.models import Mood, QS_Params
 import pandas as pd
 
-import graph_mood, graph_diet, graph_body
+import graph_mood, graph_diet, graph_body, graph_weightlifting
 
 @app.route("/")
 @app.route("/index")

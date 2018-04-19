@@ -26,5 +26,6 @@ logging.info("Ingesting sleep data...")
 #ingest.ingest_sleep()
 logging.info("Ingesting blood data...")
 #ingest.ingest_blood()
-
+logging.info("Ingesting LIFTS...")
+ingest.ingest_weightlifting()
 logging.info("-------------")

@@ -46,6 +46,15 @@ class QS_Params(db.Model):
     ketones = db.Column(db.Float)
     blood_notes = db.Column(db.String(length=100))
 
+    #Weightlifting Meta
+    start_time = db.Column(db.DateTime)
+    end_time = db.Column(db.DateTime)
+    weight = db.Column(db.Float)
+    bodyfat = db.Column(db.Float)
+    wo_rating = db.Column(db.Integer)
+    wo_designation = db.Column(db.String(length=10))
+    wo_notes = db.Column(db.String(length=255))
+
     #Other Tables
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
     journals = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
@@ -111,6 +120,10 @@ class Mood(db.Model):
 
     def __repr__(self):
         return str(self.date) + ":" + str(self.a_l) + ":" + str(self.a_u) + ":" + self.a_s + ":" + str(self.v_l) + ":" + str(self.v_u) + ":" + self.v_s
+
+# class Lifts(db.Model):
+#     __tablename__ = 'lifts'
+
 
 # class Journals(db.Model):
 #     __tablename__ = 'journals'

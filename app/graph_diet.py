@@ -25,7 +25,7 @@ def diet_figs(data, height=500, width=1200):
 
 
     wz = WheelZoomTool(dimensions='width')
-    plt_comparison_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("Intake", "@kcal_intake kcal"), ("TDEE", "@tdee kcal")],names=["kcal_intake"],mode='vline'),
+    plt_comparison_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("Intake", "@kcal_intake{1} kcal"), ("TDEE", "@tdee{1} kcal")],names=["kcal_intake"],mode='vline'),
     PanTool(dimensions='width'),
     wz,
     ResetTool(),

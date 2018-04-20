@@ -22,8 +22,8 @@ def mood():
 def body():
     q = QS_Params.query.filter(QS_Params.kcal_intake >= 0) #Should include all the days
     data = pd.read_sql(q.statement, q.session.bind)
-    script, div_days, div_avg_bg, div_avg_rhr, div_avg_slp_dur, div_avg_slp_q, plot_blood_div, plot_rhr_div, plot_osq_div, plot_body_comp_div, plot_sleep_div, ma_slider_div = graph_body.body_graph(data)
-    return render_template("body.html", data=data, script=script, div_days=div_days, div_avg_bg=div_avg_bg, div_avg_rhr=div_avg_rhr, div_avg_slp_dur=div_avg_slp_dur, div_avg_slp_q=div_avg_slp_q, plot_blood_div=plot_blood_div, plot_rhr_div=plot_rhr_div, plot_osq_div=plot_osq_div, plot_body_comp_div=plot_body_comp_div, plot_sleep_div=plot_sleep_div, ma_slider_div=ma_slider_div, title="BODY")
+    script, div_days, div_avg_bg, div_avg_rhr, div_avg_slp_dur, div_avg_slp_q, div_days_bc, div_avg_wt, div_avg_bf, plot_blood_div, plot_rhr_div, plot_osq_div, plot_body_comp_div, plot_sleep_div, ma_slider_div = graph_body.body_graph(data)
+    return render_template("body.html", data=data, script=script, div_days=div_days, div_avg_bg=div_avg_bg, div_avg_rhr=div_avg_rhr, div_avg_slp_dur=div_avg_slp_dur, div_avg_slp_q=div_avg_slp_q, div_days_bc=div_days_bc, div_avg_wt=div_avg_wt, div_avg_bf=div_avg_bf, plot_blood_div=plot_blood_div, plot_rhr_div=plot_rhr_div, plot_osq_div=plot_osq_div, plot_body_comp_div=plot_body_comp_div, plot_sleep_div=plot_sleep_div, ma_slider_div=ma_slider_div, title="BODY")
 
 @app.route("/diet")
 def diet():

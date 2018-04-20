@@ -71,7 +71,7 @@
   </div>
     <div class="panel panel-primary">
       <div class="panel-heading">
-        <h3 class="panel-title">INFORMATION</h3></div>
+        <h3 class="panel-title">INFORMATION (Sleep/BioMarkers)</h3></div>
     <div class="panel-body">
       <ul class="list-group">
         <li class="list-group-item list-group-item-info text-nowrap"><b>Days:</b> {{ div_days|safe }}</li>
@@ -79,10 +79,22 @@
         <li class="list-group-item text-nowrap"><b>Avg. Morning RHR (bpm):</b> {{ div_avg_rhr|safe }}</li>
         <li class="list-group-item text-nowrap"><b>Avg. Sleep Duration (hr):</b> {{ div_avg_slp_dur|safe }}</li>
         <li class="list-group-item text-nowrap"><b>Avg. Sleep Quality:</b> {{ div_avg_slp_q|safe }}</li>
-
       </ul>
-
       </div>
+
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">INFORMATION (Body Comp)</h3></div>
+    <div class="panel-body">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-info text-nowrap"><b>Days:</b> {{ div_days_bc|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Avg. Weight (lbs):</b> {{ div_avg_wt|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Avg. Bodyfat %:</b> {{ div_avg_bf|safe }}</li>
+      </ul>
+      </div>
+
     </div>
 
 {% endblock %}

@@ -244,3 +244,56 @@ div_avg_slp_dur.change.emit();
 div_avg_slp_q.change.emit();
 
 """)
+
+BODY_COMP_STATS_CODE = ("""
+
+var s_d = s.data
+var culled_vals = Object.assign({},s.data)
+
+var div_days_bc = d_d_bc;
+var div_avg_wt = d_a_wt;
+var div_avg_bf = d_a_bf;
+
+//Beginning and end of currently selected x_range
+var end = new Date(Number(cb_obj.end.toString()));
+var beg = new Date(Number(cb_obj.start.toString()));
+
+//Clear values
+cn = s.column_names
+for (h = 0; h < cn.length; h++) {
+    culled_vals[cn[h]] = []
+    }
+
+//Read in values of the dates in the currently selected x_range
+//***TODO: Probably some efficiency gains here...
+for (i = 0; i < s_d['date'].length; i++) {
+    if(s_d['date'][i] >= beg && s_d['date'][i] <= end){
+        for (j = 0; j < cn.length; j++) {
+            if (!isNaN(s_d[cn[j]][i])){
+                culled_vals[cn[j]].push(s_d[cn[j]][i])
+            }
+        }
+    }
+}
+
+function array_sum(a){
+var s = 0
+    for (h = 0; h < a.length; h++) {
+    s += a[h]
+    }
+    return s
+}
+
+function array_avg(a){
+    return array_sum(a)/a.length
+}
+
+div_days_bc.text = culled_vals['date'].length.toString();
+div_avg_wt.text = array_avg(culled_vals['weight']).toFixed(1).toString();
+div_avg_bf.text = array_avg(culled_vals['bodyfat']).toFixed(2).toString();
+
+div_days_bc.change.emit();
+div_avg_wt.change.emit();
+div_avg_bf.change.emit();
+
+""")

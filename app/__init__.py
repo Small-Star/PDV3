@@ -18,7 +18,7 @@ db = SQLAlchemy(app)
 from app import views, models, ingest
 from app.models import QS_Params
 
-ingest_flag = "FORCE"
+ingest_flag = "MERGE"
 
 if ingest_flag == "FORCE":
     db.drop_all()

@@ -87,8 +87,9 @@ def ingest_diet(date=""):
             self.carb_re = re.compile(r'\s*Carbs: ')
             self.fic_re = re.compile(r'\S+') #Note, this pattern is used on the BACKWARDS TDEE string
 
-        def handle_data(self, data):
+        def handle_data(self, data_):
             #Line by line parsing of input data
+            data = data_.strip()
             if re.match(self.date_re,data) != None:
                 self.date = datetime.datetime.strptime(data[2:-1],"%m/%d/%Y").date()
             elif re.match(self.calorie_intake_re,data) != None:
@@ -438,7 +439,10 @@ def ingest_weightlifting(date=""):
 
             self.lift_re = re.compile(r' - ')
 
-        def handle_data(self, data):
+            self.lift_list = []
+
+        def handle_data(self, data_):
+            data = data_.strip()
             if re.match(self.date_str_re,data) != None:
                 self.to_add.append(WL_Tup(date=self.date, start_time=self.start_time, end_time=self.end_time, weight=self.weight, bodyfat=self.bodyfat, wo_rating=self.wo_rating, wo_designation=self.wo_designation, wo_notes=self.wo_notes))
                 self.date, self.start_time, self.end_time, self.weight, self.bodyfat, self.wo_rating, self.wo_designation, self.wo_notes = datetime.date(2100,1,1), None, None, None, None, "", "", ""
@@ -468,6 +472,11 @@ def ingest_weightlifting(date=""):
             # elif re.match(self.notes_re,data) != None:
             #     self.lines.append((self.cr_date,'NOTES',data[7:]))
             #
+            elif re.match(self.lift_re,data) != None:
+                d = data.split(' - ')               #Splits into '', Lift Name, Lifts
+                if d[1] not in self.lift_list:
+                    self.lift_list.append(d[1])
+
             # elif re.match(self.lift_re,data) != None:
             #     if self.corl_flag == 'C':                       #Cardio
             #         d = data.split(' - ')
@@ -530,6 +539,13 @@ def ingest_weightlifting(date=""):
         q.wo_notes = _.wo_notes
 
         ad += 1
+
+    #Dump list of lists to a file. ***TODO: There should be a better way to do this, although the list should not change often enough to worry about it
+    f = open(os.path.join(app.config["LL_FILE"]), 'w')
+    sl = sorted(WL_Parser.lift_list)
+    print(sl)
+    [f.write(sl[i] + "\n") for i in range(len(sl))]
+    f.close()
 
     db.session.commit()
     logging.info("Ingested %s Weightlifting records; Validated %s Weightlifting records; Added %s Weightlifting records", str(len(t_a)), str(len(t_a_)), str(ad))

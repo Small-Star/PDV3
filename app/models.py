@@ -55,6 +55,23 @@ class QS_Params(db.Model):
     wo_designation = db.Column(db.String(length=10))
     wo_notes = db.Column(db.String(length=255))
 
+    # f = open(os.path.join(app.config["LL_FILE"]), 'r')
+    # lift1 = f.readline()
+    # lift2 = f.readline()
+    # lift3 = f.readline()
+    # lift4 = f.readline()
+    # f.close()
+    #
+    # ls = [lift1, lift2, lift3, lift4]
+    # c_dict = {}
+    # for i in range(4):   # Create
+    #     c_name = "mytable" + ls[i]
+    #     print(str(c_name))
+    #c_dict[c_name] = db.Column
+
+    #for i in range(4):   # Query
+    #    session.query(table_dict["mytable" + str(i)])
+
     #Other Tables
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
     journals = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")

@@ -74,7 +74,8 @@ class QS_Params(db.Model):
 
     #Other Tables
     mood = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
-    journals = db.relationship('Mood', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Mood.date")
+    #journals = db.relationship('Journals', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Journals.date")
+    lifts = db.relationship('Lifts', uselist=False, back_populates="qsp", primaryjoin="QS_Params.date == Lifts.date")
 
     def __init__(self, date):
         self.date = date
@@ -138,10 +139,20 @@ class Mood(db.Model):
     def __repr__(self):
         return str(self.date) + ":" + str(self.a_l) + ":" + str(self.a_u) + ":" + self.a_s + ":" + str(self.v_l) + ":" + str(self.v_u) + ":" + self.v_s
 
-# class Lifts(db.Model):
-#     __tablename__ = 'lifts'
+class Lifts(db.Model):
+    __tablename__ = 'lifts'
 
+    date = db.Column(db.Date, db.ForeignKey('qs_params.date'), index=True, unique=True, primary_key=True)
+    qsp = db.relationship("QS_Params", back_populates="lifts")
 
+    #Squats
+    squat_str = db.Column(db.String(length=100))
+    squat_max = db.Column(db.Integer)
+    squat_max_vol_per_set = db.Column(db.Integer)
+    squat_total_vol = db.Column(db.Integer)
+
+    def __init__(self, date):
+        self.date = date
 # class Journals(db.Model):
 #     __tablename__ = 'journals'
 #     date = db.Column(db.Date, db.ForeignKey('qs_params.date'), index=True, unique=True, primary_key=True)

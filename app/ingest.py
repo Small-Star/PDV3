@@ -2,7 +2,7 @@ from html.parser import HTMLParser
 import re, datetime, os, logging
 
 from app import app, db
-from app.models import Mood, QS_Params
+from app.models import Mood, QS_Params, Lifts
 
 from collections import namedtuple
 
@@ -60,7 +60,6 @@ def ingest_mood(date=""):
     ad = 0;
     for _ in t_a_:
         if Mood.query.get(_.date) == None:
-            #db.session.merge(Mood(_.date,_.a_l,_.a_u,_.a_s,_.v_l,_.v_u,_.v_s))
             db.session.merge(Mood(_.date,_.a_l,_.a_u,_.a_s,_.v_l,_.v_u,_.v_s))
             ad += 1
 
@@ -437,7 +436,7 @@ def ingest_weightlifting(date=""):
             self.rating_re = re.compile(r'Rating: ')
             self.notes_re = re.compile(r'Notes: ')
 
-            self.lift_re = re.compile(r' - ')
+            self.lift_re = re.compile(r'- ')
 
             self.lift_list = []
 
@@ -473,24 +472,43 @@ def ingest_weightlifting(date=""):
             #     self.lines.append((self.cr_date,'NOTES',data[7:]))
             #
             elif re.match(self.lift_re,data) != None:
-                d = data.split(' - ')               #Splits into '', Lift Name, Lifts
-                if d[1] not in self.lift_list:
-                    self.lift_list.append(d[1])
+                d = data.split('-')               #Splits into '', Lift Name, Lifts
 
-            # elif re.match(self.lift_re,data) != None:
-            #     if self.corl_flag == 'C':                       #Cardio
-            #         d = data.split(' - ')
-            #         self.lines.append((self.cr_date,'CARDIO',(d[1],d[-1])))   #tuple is type, duration (can be floors or minutes)
-            #     elif self.corl_flag == 'L':
-            #         d = data.split(' - ')           #Splits into '', Lift Name, Lifts
-            #         l = d[2].split(', ')            #Splits Lifts by csv
-            #         for el in l:
-            #             if len(el.split('x')) == 2: #This is not a multi-set lift
-            #                 self.lines.append((self.cr_date,'LIFT',(d[1],el)))                              #Appends a tuple of (Lift Name, Weightxrep)
-            #             elif len(el.split('x')) == 3: #This is a multi-set lift
-            #                 for x in range(int(re.split('[IF]',el.split('x')[-1])[0])):
-            #                     reconstituted_el = str(el.split('x')[0] + 'x' + el.split('x')[1])           #Make a number of entries corresponding to the third value
-            #                     self.lines.append((self.cr_date,'LIFT',(d[1],reconstituted_el)))            #Appends a tuple of (Lift Name, Weightxrep)
+                if d[1].strip() not in self.lift_list:
+                    self.lift_list.append(d[1].strip())
+
+                if d[1].strip() == "Squat":
+                    s_max = 0
+                    s_total_vol = 0
+                    s_max_vol_per_set = 0
+                    int_vol = 0
+
+                    #If entry does not exist, create it
+                    if Lifts.query.get(self.date) == None:
+                        l = Lifts(self.date)
+                        db.session.merge(l)
+
+                    #Add squat entry
+                    l = Lifts.query.get(self.date)
+
+                    ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
+
+                    for el in ss.strip().split(', '):
+
+                        if int(el.split('x')[0]) > s_max:
+                            s_max = int(el.split('x')[0])
+                        if len(el.split('x')) == 2: #This is not a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                        elif len(el.split('x')) == 3: #This is a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])*int(el.split('x')[2])
+                        s_total_vol += int_vol  
+                        if int_vol > s_max_vol_per_set:
+                            s_max_vol_per_set = int_vol 
+                    l.squat_str = d[2].strip()                    
+                    l.squat_max = s_max
+                    l.squat_total_vol = s_total_vol
+                    l.squat_max_vol_per_set = s_max_vol_per_set
+                    db.session.merge(l)
 
 
         def get_lifts(self):
@@ -543,10 +561,19 @@ def ingest_weightlifting(date=""):
     #Dump list of lists to a file. ***TODO: There should be a better way to do this, although the list should not change often enough to worry about it
     f = open(os.path.join(app.config["LL_FILE"]), 'w')
     sl = sorted(WL_Parser.lift_list)
-    print(sl)
+    #print(sl)
     [f.write(sl[i] + "\n") for i in range(len(sl))]
     f.close()
 
     db.session.commit()
+
+    test = db.session.query(Lifts).all()
+    [print(_.squat_str, _.squat_max, _.squat_max_vol_per_set, _.squat_total_vol) for _ in test] #if _.date > datetime.date(2017,4,10)]
+    
+    print("Total Vol: ", sum([_.squat_total_vol for _ in test]))
+    print("Max Max Vol per Set: ", max([_.squat_max_vol_per_set for _ in test]))
+    print("Max Max: ", max([_.squat_max for _ in test]))
+    db.session.commit()
+
     logging.info("Ingested %s Weightlifting records; Validated %s Weightlifting records; Added %s Weightlifting records", str(len(t_a)), str(len(t_a_)), str(ad))
     print("Weightlifting Ingest complete")

@@ -1,8 +1,59 @@
 {% extends "base.html" %}
+{% block head_ctnt %}
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.js"></script>
+  {{ script|safe }}
+{% endblock %}
+
 {% block main_ctnt %}
-    <h1>Lifts</h1>
+<!-- Graph Panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Lift Numbers</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_graph">
+  </div>
+  <div id="pan_graph" class="panel-body panel-collapse collapse in">
+    {{ plot_graph_div|safe }}
+  </div>
+</div>
+
+<!-- Battleship Panel -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">How Many Battleships?</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_battleship">
+  </div>
+  <div id="pan_battleship" class="panel-body panel-collapse collapse in">
+    {{ plot_battleship_div|safe }}
+  </div>
+</div>
 {% endblock %}
 
 {% block info_bar_ctnt %}
-    <h3>INFORMATION</h3>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">SELECT LIFT</h3></div>
+  <div class="panel-body">
+      
+    </div>
+  </div>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">INFORMATION</h3></div>
+    <div class="panel-body">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-info text-nowrap"><b>MAX:</b> {{ div_max|safe }}</li>
+        <li class="list-group-item list-group-item-info text-nowrap"><b>Max Vol/Set:</b> {{ div_max_vol_per_set|safe }}</li>
+        <li class="list-group-item list-group-item-info text-nowrap"><b>Total Volume</b> {{ div_total_volume|safe }}</li>
+      </ul>
+
+      </div>
+    </div>
+
 {% endblock %}

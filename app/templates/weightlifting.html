@@ -15,22 +15,31 @@
 <!-- Graph Panel -->
 <div class="panel panel-primary">
   <div class="panel-heading">
-    <h3 class="panel-title">Lift Numbers</h3>
-    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_graph">
+    <h3 class="panel-title">MAXES</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_max">
   </div>
-  <div id="pan_graph" class="panel-body panel-collapse collapse in">
-    {{ plot_graph_div|safe }}
+  <div id="pan_max" class="panel-body panel-collapse collapse in">
+    {{ plot_max_div|safe }}
   </div>
 </div>
 
-<!-- Battleship Panel -->
 <div class="panel panel-primary">
   <div class="panel-heading">
-    <h3 class="panel-title">How Many Battleships?</h3>
-    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_battleship">
+    <h3 class="panel-title">Max Volume Per Set</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_mvps">
   </div>
-  <div id="pan_battleship" class="panel-body panel-collapse collapse in">
-    {{ plot_battleship_div|safe }}
+  <div id="pan_mvps" class="panel-body panel-collapse collapse in">
+    {{ plot_mvps_div|safe }}
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Total Volume</h3>
+    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_tv">
+  </div>
+  <div id="pan_tv" class="panel-body panel-collapse collapse in">
+    {{ plot_tv_div|safe }}
   </div>
 </div>
 {% endblock %}
@@ -50,7 +59,7 @@
       <ul class="list-group">
         <li class="list-group-item list-group-item-info text-nowrap"><b>MAX:</b> {{ div_max|safe }}</li>
         <li class="list-group-item list-group-item-info text-nowrap"><b>Max Vol/Set:</b> {{ div_max_vol_per_set|safe }}</li>
-        <li class="list-group-item list-group-item-info text-nowrap"><b>Total Volume</b> {{ div_total_volume|safe }}</li>
+        <li class="list-group-item list-group-item-info text-nowrap"><b>Total Volume</b> {{ div_total_vol|safe }}</li>
       </ul>
 
       </div>

@@ -1,6 +1,6 @@
 from flask import render_template
 from app import app, db
-from app.models import Mood, QS_Params
+from app.models import Mood, QS_Params, Lifts
 import pandas as pd
 
 import graph_mood, graph_diet, graph_body, graph_weightlifting
@@ -36,8 +36,8 @@ def diet():
 def weightlifting():
     q = Lifts.query.filter(Lifts.date != None)
     data = pd.read_sql(q.statement, q.session.bind)
-    script, plot_graph_div, plot_battleship_div, div_max, div_max_vol_per_set, div_total_volume = graph_weightlifting.weightlifting_graph(data)
-    return render_template("weightlifting.html",data=data, plot_graph_div=plot_graph_div, plot_battleship_div=plot_battleship_div, div_max=div_max, div_max_vol_per_set=div_max_vol_per_set, div_total_volume=div_total_volume, title="WEIGHTLIFTING")
+    script, div_max, div_max_vol_per_set, div_total_vol, plot_max_div, plot_mvps_div, plot_tv_div = graph_weightlifting.weightlifting_graph(data)
+    return render_template("weightlifting.html",data=data, script=script, div_max=div_max, div_max_vol_per_set=div_max_vol_per_set, div_total_vol=div_total_vol, plot_max_div=plot_max_div, plot_mvps_div=plot_mvps_div, plot_tv_div=plot_tv_div, title="WEIGHTLIFTING")
 
 @app.route("/books")
 def books():

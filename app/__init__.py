@@ -39,7 +39,7 @@ if ingest_flag == "MERGE" or ingest_flag == "FORCE":
     logging.info("Ingesting blood data...")
     #ingest.ingest_blood()
     logging.info("Ingesting LIFTS...")
-    #ingest.ingest_weightlifting()
+    ingest.ingest_weightlifting()
     logging.info("-------------")
 
 num_rec = db.session.query(QS_Params).count()

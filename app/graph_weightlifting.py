@@ -3,6 +3,7 @@ import datetime
 
 from bokeh.models import HoverTool, FactorRange, Plot, LinearAxis, Grid, Range1d, Slider, PanTool, WheelZoomTool, ResetTool, SaveTool, CustomJS
 from bokeh.models.glyphs import Line
+from bokeh.models.markers import X
 from bokeh.plotting import figure
 from bokeh.charts import Line
 from bokeh.embed import components
@@ -12,51 +13,61 @@ from bokeh.models.widgets import Div
 from helper_functions import *
 
 def weightlifting_graph(data):
-	script_div, (plot_graph_div, plot_battleship_div, div_max, div_max_vol_per_set, div_total_volume) = weightlifting_figs(data)
-    return script_div, plot_graph_div, plot_battleship_div, div_max, div_max_vol_per_set, div_total_volume
+	'''Weightlifting graphs'''
+	script_div, (div_max, div_max_vol_per_set, div_total_volume, plot_max_div, plot_mvps_div, plot_tv_div) = weightlifting_figs(data)
+	return script_div, div_max, div_max_vol_per_set, div_total_volume, plot_max_div, plot_mvps_div, plot_tv_div
 
 
 def weightlifting_figs(data, height = 500, width = 1200):
     #Timeseries Plot
-    wz = WheelZoomTool(dimensions='width')
-    plot_ts_tools = [HoverTool(tooltips=[("Date", "@date_str")]),
-    PanTool(dimensions='width'),
-    wz,
-    ResetTool(),
-    SaveTool()]
+    wz_max = WheelZoomTool(dimensions='width')
+    plot_max_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("Squat", "@squat_max")]), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+
+    wz_mvps = WheelZoomTool(dimensions='width')
+    plot_mvps_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("Squat", "@squat_max_vol_per_set")]), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
+
+    wz_tv = WheelZoomTool(dimensions='width')
+    plot_tv_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("Squat", "@squat_total_vol")]), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
 
     data['date_str'] = data['date'].map(str)
 
-    cds_working = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], a_l=data['a_l'], a_u=data['a_u'], a_be=data['a_be'], v_l=data['v_l'], v_u=data['v_u'], v_be=data['v_be']))
-    cds_static = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], a_l=data['a_l'], a_u=data['a_u'], a_be=data['a_be'], v_l=data['v_l'], v_u=data['v_u'], v_be=data['v_be']))
+    cds_max = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], squat_max=data['squat_max']))
 
-    plot_ts = figure(x_axis_type="datetime", title="Mood (AV Circumplex Model)", h_symmetry=False, v_symmetry=False,
-                  min_border=0, plot_height=height, plot_width=width, y_range=[1,9], toolbar_location="above", outline_line_color="#666666", tools=plot_ts_tools, active_scroll=wz)
+    plot_max = figure(x_axis_type="datetime", title="MAXes", h_symmetry=False, v_symmetry=False,
+                  min_border=0, plot_height=height, plot_width=width, toolbar_location="above", outline_line_color="#666666", tools=plot_max_tools, active_scroll=wz_max)
+    plot_max.line('date', 'squat_max', source=cds_max, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Squat Max (lbs)")
 
-    plot_ts.line('date', 'a_l', source=cds_working, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="A (Lower Bound)")
-    plot_ts.line('date', 'a_u', source=cds_working, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="A (Upper Bound)")
-    plot_ts.line('date', 'a_be', source=cds_working, line_color="#8B0A50", line_width=3, line_alpha=0.6, legend="A (Best Est.)")
+    glyph = X(x='date', y='squat_max', line_color="#8B0A50", line_width=1, line_alpha=0.6)
+    plot_max.add_glyph(cds_max, glyph)
+    plot_max.legend.location = "top_left"
+    plot_max.legend.click_policy="hide"
 
-    plot_ts.line('date', 'v_l', source=cds_working, line_color="#00E5EE", line_width=1, line_alpha=0.6, legend="V (Lower Bound)")
-    plot_ts.line('date', 'v_u', source=cds_working, line_color="#00E5EE", line_width=1, line_alpha=0.6, legend="V (Upper Bound)")
-    plot_ts.line('date', 'v_be', source=cds_working, line_color="#00E5EE", line_width=3, line_alpha=0.6, legend="V (Best Est.)")
+    cds_mvps = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], squat_max_vol_per_set=data['squat_max_vol_per_set']))
 
-    plot_ts.legend.location = "top_left"
-    plot_ts.legend.click_policy="hide"
+    plot_mvps = figure(x_axis_type="datetime", title="Maximum Volume Per Set", h_symmetry=False, v_symmetry=False,
+                  min_border=0, plot_height=height, plot_width=width, toolbar_location="above", outline_line_color="#666666", tools=plot_mvps_tools, active_scroll=wz_mvps)
 
-    #Vis_Rep Plot
-    plot_vr = figure(title="Mood (AV Circumplex Model)", h_symmetry=False, v_symmetry=False,
-                      min_border=0, plot_height=height, plot_width=width, x_range=[1,9], y_range=[1,9], toolbar_location="above", outline_line_color="#666666", x_axis_label='Alertness', y_axis_label="Valence")
+    plot_mvps.line('date', 'squat_max_vol_per_set', source=cds_mvps, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Squat MVPS (lbs)")
+    glyph = X(x='date', y='squat_max_vol_per_set', line_color="#8B0A50", line_width=1, line_alpha=0.6)
+    plot_mvps.add_glyph(cds_mvps, glyph)
 
-    div_days = Div()
-    div_avg_a = Div()
-    div_avg_v = Div()
-    div_good_days = Div()
-    div_poor_days = Div()
-    div_caution_days = Div()
-    div_warning_days = Div()
+    plot_mvps.legend.location = "top_left"
+    plot_mvps.legend.click_policy="hide"
 
-    ma_cb = CustomJS(args=dict(w=cds_working, s=cds_static), code=MA_SLIDER_CODE)
-    plot_ts.x_range.callback = CustomJS(args=dict(d_d=div_days, d_avg_a=div_avg_a, d_avg_v=div_avg_v, d_g_d=div_good_days, d_p_d=div_poor_days, d_c_d=div_caution_days, d_w_d=div_warning_days, s=cds_static), code=MOOD_STATS_CODE)
-    ma_slider = Slider(start=1, end=30, value=1, step=1, title="Moving Average", callback=ma_cb)
-    return components((div_days, div_avg_a, div_avg_v, div_good_days, div_poor_days, div_caution_days, div_warning_days, plot_ts, plot_vr, ma_slider))
+    cds_tv = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], squat_total_vol=data['squat_total_vol']))
+
+    plot_tv = figure(x_axis_type="datetime", title="Total Volume", h_symmetry=False, v_symmetry=False,
+                  min_border=0, plot_height=height, plot_width=width, toolbar_location="above", outline_line_color="#666666", tools=plot_tv_tools, active_scroll=wz_tv)
+
+    plot_tv.line('date', 'squat_total_vol', source=cds_tv, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Total Squat Volume (lbs)")
+    glyph = X(x='date', y='squat_total_vol', line_color="#8B0A50", line_width=1, line_alpha=0.6)
+    plot_tv.add_glyph(cds_tv, glyph)
+
+    plot_tv.legend.location = "top_left"
+    plot_tv.legend.click_policy="hide"
+
+    div_max = Div()
+    div_max_vol_per_set = Div()
+    div_total_vol = Div()
+
+    return components((div_max, div_max_vol_per_set, div_total_vol, plot_max, plot_mvps, plot_tv))

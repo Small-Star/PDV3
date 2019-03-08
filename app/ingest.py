@@ -508,6 +508,7 @@ def ingest_weightlifting(date=""):
                     l.squat_max = s_max
                     l.squat_total_vol = s_total_vol
                     l.squat_max_vol_per_set = s_max_vol_per_set
+                    #NOTE:ERROR:MVPS calculations are wrong; ***FIX***
                     db.session.merge(l)
 
 
@@ -568,7 +569,7 @@ def ingest_weightlifting(date=""):
     db.session.commit()
 
     test = db.session.query(Lifts).all()
-    [print(_.squat_str, _.squat_max, _.squat_max_vol_per_set, _.squat_total_vol) for _ in test] #if _.date > datetime.date(2017,4,10)]
+    [print(_.date, _.squat_str, _.squat_max, _.squat_max_vol_per_set, _.squat_total_vol) for _ in test] #if _.date > datetime.date(2017,4,10)]
     
     print("Total Vol: ", sum([_.squat_total_vol for _ in test]))
     print("Max Max Vol per Set: ", max([_.squat_max_vol_per_set for _ in test]))

@@ -22,6 +22,11 @@ def weightlifting_graph(data):
 def weightlifting_figs(data, height = 500, width = 1200):
     #Timeseries Plot
     wz_max = WheelZoomTool(dimensions='width')
+    plot_max_tools_s = [HoverTool(tooltips=[("Squat", "@squat_max")], names=["squat_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+    plot_max_tools_d = [HoverTool(tooltips=[("Deadlift", "@deadlift_max"), (" ", " ")], names=["deadlift_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+    plot_max_tools_b = [HoverTool(tooltips=[("Bench Press", "@bench_max")], names=["bench_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+    plot_max_tools_o = [HoverTool(tooltips=[("OHP", "@ohp_max")], names=["ohp_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+
 
     wz_mvps = WheelZoomTool(dimensions='width')
     plot_mvps_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("Squat", "@squat_max_vol_per_set"), ("Deadlift", "@deadlift_max_vol_per_set"), ("Bench Press", "@bench_max_vol_per_set"), ("OHP", "@ohp_max_vol_per_set")]), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
@@ -67,24 +72,29 @@ def weightlifting_figs(data, height = 500, width = 1200):
     cds_max.add(o_m, name='o_m')
 
     plot_max = figure(x_axis_type="datetime", title="MAXes", h_symmetry=False, v_symmetry=False,
-                  min_border=0, plot_height=height, plot_width=width, toolbar_location="above", outline_line_color="#666666", active_scroll=wz_max)
+                  min_border=0, plot_height=height, plot_width=width, toolbar_location="above", outline_line_color="#666666", active_scroll=wz_max,tools=plot_max_tools_d)
     
     plot_max.yaxis.axis_label = "lbs"
 
-    cr = plot_max.circle('date', 'squat_max', source=cds_max, size=20, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.05, hover_alpha=0.3, line_color=None, hover_line_color="white")
-    plot_max_tools = [HoverTool(tooltips=[("Date", "@date_str"), ("Squat", "@squat_max"), ("Deadlift", "@deadlift_max"), ("Bench Press", "@bench_max"), ("OHP", "@ohp_max")], renderers=[cr], mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
-    plot_max.add_tools(plot_max_tools[0])
-    plot_max.line('date', 's_m', source=cds_max, line_color="#8B0A50", line_width=2, line_alpha=0.6, legend="Squat (Clamp)")
-    plot_max.cross('date', 'squat_max', source=cds_max, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Squat (Actual)")    
+    #sr = plot_max.circle('date', 'squat_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
+    #dr = plot_max.circle('date', 'deadlift_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
+    #br = plot_max.circle('date', 'bench_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
+    #ohpr = plot_max.circle('date', 'ohp_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
 
-    plot_max.line('date', 'd_m', source=cds_max, line_color="#333366", line_width=2, line_alpha=0.6, legend="Deadlift (Clamp)")
-    plot_max.cross('date', 'deadlift_max', source=cds_max, line_color="#333366", line_width=1, line_alpha=0.6, legend="Deadlift (Actual)")    
+    #plot_max.add_tools(HoverTool(tooltips=None, renderers=[sr, dr, br, ohpr], mode='vline'))
+    plot_max.add_tools(plot_max_tools_s[0], plot_max_tools_b[0] ,plot_max_tools_o[0])
 
-    plot_max.line('date', 'b_m', source=cds_max, line_color="#FF7700", line_width=2, line_alpha=0.6, legend="Bench Press (Clamp)")
-    plot_max.cross('date', 'bench_max', source=cds_max, line_color="#FF7700", line_width=1, line_alpha=0.6, legend="Bench Press (Actual)")    
+    plot_max.line('date', 's_m', source=cds_max, name='squat_clamp', line_color="#8B0A50", line_width=2, line_alpha=0.6, legend="Squat (Clamp)")
+    plot_max.cross('date', 'squat_max', source=cds_max, name="squat_max", line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Squat (Actual)")    
 
-    plot_max.line('date', 'o_m', source=cds_max, line_color="#C74D56", line_width=2, line_alpha=0.6, legend="OHP (Clamp)")
-    plot_max.cross('date', 'ohp_max', source=cds_max, line_color="#C74D56", line_width=1, line_alpha=0.6, legend="OHP (Actual)")    
+    plot_max.line('date', 'd_m', source=cds_max, name='deadlift_clamp', line_color="#333366", line_width=2, line_alpha=0.6, legend="Deadlift (Clamp)")
+    plot_max.cross('date', 'deadlift_max', source=cds_max, name="deadlift_max", line_color="#333366", line_width=1, line_alpha=0.6, legend="Deadlift (Actual)")    
+
+    plot_max.line('date', 'b_m', source=cds_max, name='bench_clamp', line_color="#FF7700", line_width=2, line_alpha=0.6, legend="Bench Press (Clamp)")
+    plot_max.cross('date', 'bench_max', source=cds_max, name="bench_max", line_color="#FF7700", line_width=1, line_alpha=0.6, legend="Bench Press (Actual)")    
+
+    plot_max.line('date', 'o_m', source=cds_max, name='ohp_clamp', line_color="#C74D56", line_width=2, line_alpha=0.6, legend="OHP (Clamp)")
+    plot_max.cross('date', 'ohp_max', source=cds_max, name="ohp_max", line_color="#C74D56", line_width=1, line_alpha=0.6, legend="OHP (Actual)")    
 
     plot_max.legend.location = "top_left"
     plot_max.legend.click_policy="hide"

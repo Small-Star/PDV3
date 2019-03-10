@@ -151,6 +151,21 @@ class Lifts(db.Model):
     squat_max_vol_per_set = db.Column(db.Integer)
     squat_total_vol = db.Column(db.Integer)
 
+    deadlift_str = db.Column(db.String(length=100))
+    deadlift_max = db.Column(db.Integer)
+    deadlift_max_vol_per_set = db.Column(db.Integer)
+    deadlift_total_vol = db.Column(db.Integer)
+
+    bench_str = db.Column(db.String(length=100))
+    bench_max = db.Column(db.Integer)
+    bench_max_vol_per_set = db.Column(db.Integer)
+    bench_total_vol = db.Column(db.Integer)
+
+    ohp_str = db.Column(db.String(length=100))
+    ohp_max = db.Column(db.Integer)
+    ohp_max_vol_per_set = db.Column(db.Integer)
+    ohp_total_vol = db.Column(db.Integer)
+
     def __init__(self, date):
         self.date = date
 # class Journals(db.Model):

@@ -499,18 +499,120 @@ def ingest_weightlifting(date=""):
                             s_max = int(el.split('x')[0])
                         if len(el.split('x')) == 2: #This is not a multi-set lift
                             int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            s_total_vol += int_vol 
                         elif len(el.split('x')) == 3: #This is a multi-set lift
-                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])*int(el.split('x')[2])
-                        s_total_vol += int_vol  
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            s_total_vol += int_vol*int(el.split('x')[2])
                         if int_vol > s_max_vol_per_set:
                             s_max_vol_per_set = int_vol 
                     l.squat_str = d[2].strip()                    
                     l.squat_max = s_max
                     l.squat_total_vol = s_total_vol
                     l.squat_max_vol_per_set = s_max_vol_per_set
-                    #NOTE:ERROR:MVPS calculations are wrong; ***FIX***
                     db.session.merge(l)
 
+                #There has got to be a better way to do this
+                elif d[1].strip() == "Deadlift":
+                    d_max = 0
+                    d_total_vol = 0
+                    d_max_vol_per_set = 0
+                    int_vol = 0
+
+                    #If entry does not exist, create it
+                    if Lifts.query.get(self.date) == None:
+                        l = Lifts(self.date)
+                        db.session.merge(l)
+
+                    #Add squat entry
+                    l = Lifts.query.get(self.date)
+
+                    ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
+
+                    for el in ss.strip().split(', '):
+
+                        if int(el.split('x')[0]) > d_max:
+                            d_max = int(el.split('x')[0])
+                        if len(el.split('x')) == 2: #This is not a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            d_total_vol += int_vol 
+                        elif len(el.split('x')) == 3: #This is a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            d_total_vol += int_vol*int(el.split('x')[2])
+                        if int_vol > d_max_vol_per_set:
+                            d_max_vol_per_set = int_vol 
+                    l.deadlift_str = d[2].strip()                    
+                    l.deadlift_max = d_max
+                    l.deadlift_total_vol = d_total_vol
+                    l.deadlift_max_vol_per_set = d_max_vol_per_set
+                    db.session.merge(l)
+
+                if d[1].strip() == "Bench Press":
+                    b_max = 0
+                    b_total_vol = 0
+                    b_max_vol_per_set = 0
+                    int_vol = 0
+
+                    #If entry does not exist, create it
+                    if Lifts.query.get(self.date) == None:
+                        l = Lifts(self.date)
+                        db.session.merge(l)
+
+                    #Add squat entry
+                    l = Lifts.query.get(self.date)
+
+                    ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
+
+                    for el in ss.strip().split(', '):
+
+                        if int(el.split('x')[0]) > b_max:
+                            b_max = int(el.split('x')[0])
+                        if len(el.split('x')) == 2: #This is not a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            b_total_vol += int_vol 
+                        elif len(el.split('x')) == 3: #This is a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            b_total_vol += int_vol*int(el.split('x')[2])
+                        if int_vol > b_max_vol_per_set:
+                            b_max_vol_per_set = int_vol 
+                    l.bench_str = d[2].strip()                    
+                    l.bench_max = b_max
+                    l.bench_total_vol = b_total_vol
+                    l.bench_max_vol_per_set = b_max_vol_per_set
+                    db.session.merge(l)
+
+                if d[1].strip() == "Overhead Press":
+                    o_max = 0
+                    o_total_vol = 0
+                    o_max_vol_per_set = 0
+                    int_vol = 0
+
+                    #If entry does not exist, create it
+                    if Lifts.query.get(self.date) == None:
+                        l = Lifts(self.date)
+                        db.session.merge(l)
+
+                    #Add squat entry
+                    l = Lifts.query.get(self.date)
+
+                    ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
+
+                    for el in ss.strip().split(', '):
+
+                        if int(el.split('x')[0]) > o_max:
+                            o_max = int(el.split('x')[0])
+                        if len(el.split('x')) == 2: #This is not a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            o_total_vol += int_vol 
+                        elif len(el.split('x')) == 3: #This is a multi-set lift
+                            int_vol = int(el.split('x')[0])*int(el.split('x')[1])
+                            o_total_vol += int_vol*int(el.split('x')[2])
+                        if int_vol > o_max_vol_per_set:
+                            o_max_vol_per_set = int_vol 
+                    l.ohp_str = d[2].strip()                    
+                    l.ohp_max = o_max
+                    l.ohp_total_vol = o_total_vol
+                    l.ohp_max_vol_per_set = o_max_vol_per_set
+                    db.session.merge(l)
 
         def get_lifts(self):
             self.to_add.append(WL_Tup(date=self.date, start_time=self.start_time, end_time=self.end_time, weight=self.weight, bodyfat=self.bodyfat, wo_rating=self.wo_rating, wo_designation=self.wo_designation, wo_notes=self.wo_notes))
@@ -569,11 +671,11 @@ def ingest_weightlifting(date=""):
     db.session.commit()
 
     test = db.session.query(Lifts).all()
-    [print(_.date, _.squat_str, _.squat_max, _.squat_max_vol_per_set, _.squat_total_vol) for _ in test] #if _.date > datetime.date(2017,4,10)]
+    [print(_.date, _.squat_str, _.squat_max, _.squat_max_vol_per_set, _.squat_total_vol) for _ in test if _.squat_str != None] #if _.date > datetime.date(2017,4,10)]
     
-    print("Total Vol: ", sum([_.squat_total_vol for _ in test]))
-    print("Max Max Vol per Set: ", max([_.squat_max_vol_per_set for _ in test]))
-    print("Max Max: ", max([_.squat_max for _ in test]))
+    print("Squat Total Vol: ", sum([_.squat_total_vol for _ in test if _.squat_str != None]))
+    print("Squat Max Max Vol per Set: ", max([_.squat_max_vol_per_set for _ in test if _.squat_str != None]))
+    print("Squat Max Max: ", max([_.squat_max for _ in test if _.squat_str != None]))
     db.session.commit()
 
     logging.info("Ingested %s Weightlifting records; Validated %s Weightlifting records; Added %s Weightlifting records", str(len(t_a)), str(len(t_a_)), str(ad))

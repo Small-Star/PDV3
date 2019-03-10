@@ -72,9 +72,10 @@ for (h = 0; h < cn.length; h++) {
 for (i = 0; i < s_d['date'].length; i++) {
     if(s_d['date'][i] >= beg && s_d['date'][i] <= end){
         for (j = 0; j < cn.length; j++) {
-            if (!isNaN(s_d[cn[j]][i])){
+            //if (!isNaN(s_d[cn[j]][i])){
                 culled_vals[cn[j]].push(s_d[cn[j]][i])
-            }
+            //}
+
         }
     }
 }
@@ -295,5 +296,47 @@ div_avg_bf.text = array_avg(culled_vals['bodyfat']).toFixed(2).toString();
 div_days_bc.change.emit();
 div_avg_wt.change.emit();
 div_avg_bf.change.emit();
+
+""")
+
+LIFTS_STATS_CODE = ("""
+
+var s_d = s.data
+var w_d = w.data
+
+var w_d = Object.assign({},s.data)
+
+
+//Beginning and end of currently selected x_range
+var end = new Date(Number(cb_obj.end.toString()));
+var beg = new Date(Number(cb_obj.start.toString()));
+
+//Clear values
+cn = s.column_names
+for (h = 0; h < cn.length; h++) {
+    w_d[cn[h]] = []
+    }
+
+//Read in values of the dates in the currently selected x_range
+//***TODO: Probably some efficiency gains here...
+for (i = 0; i < s_d['date'].length; i++) {
+    if(s_d['date'][i] >= beg && s_d['date'][i] <= end){
+        for (j = 0; j < cn.length; j++) {
+                w_d[cn[j]].push(Math.max(s_d[cn[j]][i],w_d[cn[j]][i-1],1000))
+        }
+    }
+}
+
+function array_sum(a){
+var s = 0
+    for (h = 0; h < a.length; h++) {
+    s += a[h]
+    }
+    return s
+}
+
+function array_avg(a){
+    return array_sum(a)/a.length
+}
 
 """)

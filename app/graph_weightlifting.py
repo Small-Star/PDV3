@@ -22,23 +22,23 @@ def weightlifting_graph(data):
 def weightlifting_figs(data, height = 500, width = 1200):
 	#Timeseries Plot
 	wz_max = WheelZoomTool(dimensions='width')
-	plot_max_tools_s = [HoverTool(tooltips=[("Squat", "@squat_max")], names=["squat_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
-	plot_max_tools_d = [HoverTool(tooltips=[("Deadlift", "@deadlift_max"), (" ", " ")], names=["deadlift_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
-	plot_max_tools_b = [HoverTool(tooltips=[("Bench Press", "@bench_max")], names=["bench_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
-	plot_max_tools_o = [HoverTool(tooltips=[("OHP", "@ohp_max")], names=["ohp_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+	plot_max_tools_s = [HoverTool(tooltips=[("Squat", "@s_m : @squat_max")], names=["squat_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+	plot_max_tools_d = [HoverTool(tooltips=[("Deadlift", "@d_m : @deadlift_max"), (" ", " ")], names=["deadlift_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+	plot_max_tools_b = [HoverTool(tooltips=[("Bench Press", "@b_m : @bench_max")], names=["bench_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
+	plot_max_tools_o = [HoverTool(tooltips=[("OHP", "@o_m : @ohp_max")], names=["ohp_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
 
 
 	wz_mvps = WheelZoomTool(dimensions='width')
-	plot_mvps_tools_s = [HoverTool(tooltips=[("Squat", "@squat_max_vol_per_set{1}")], names=["s_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
-	plot_mvps_tools_d = [HoverTool(tooltips=[("Deadlift", "@deadlift_max_vol_per_set{1}")], names=["d_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
-	plot_mvps_tools_b = [HoverTool(tooltips=[("Bench Press", "@bench_max_vol_per_set{1}")], names=["b_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
-	plot_mvps_tools_o = [HoverTool(tooltips=[("OHP", "@ohp_max_vol_per_set{1}")], names=["o_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
+	plot_mvps_tools_s = [HoverTool(tooltips=[("Squat", "@s_mvps{1} : @squat_max_vol_per_set{1}")], names=["s_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
+	plot_mvps_tools_d = [HoverTool(tooltips=[("Deadlift", "@d_mvps{1} : @deadlift_max_vol_per_set{1}")], names=["d_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
+	plot_mvps_tools_b = [HoverTool(tooltips=[("Bench Press", "@b_mvps{1} : @bench_max_vol_per_set{1}")], names=["b_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
+	plot_mvps_tools_o = [HoverTool(tooltips=[("OHP", "@o_mvps{1} : @ohp_max_vol_per_set{1}")], names=["o_mvps"],mode='vline'), PanTool(dimensions='width'), wz_mvps, ResetTool(), SaveTool()]
 
 	wz_tv = WheelZoomTool(dimensions='width')
-	plot_tv_tools_s = [HoverTool(tooltips=[("Squat", "@squat_total_vol{1}")], names=["s_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
-	plot_tv_tools_d = [HoverTool(tooltips=[("Deadlift", "@deadlift_total_vol{1}")], names=["d_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
-	plot_tv_tools_b = [HoverTool(tooltips=[("Bench Press", "@bench_total_vol{1}")], names=["b_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
-	plot_tv_tools_o = [HoverTool(tooltips=[("OHP", "@ohp_total_vol{1}")], names=["o_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
+	plot_tv_tools_s = [HoverTool(tooltips=[("Squat", "@s_tv{1} : @squat_total_vol{1}")], names=["s_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
+	plot_tv_tools_d = [HoverTool(tooltips=[("Deadlift", "@d_tv{1} : @deadlift_total_vol{1}")], names=["d_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
+	plot_tv_tools_b = [HoverTool(tooltips=[("Bench Press", "@b_tv{1} : @bench_total_vol{1}")], names=["b_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
+	plot_tv_tools_o = [HoverTool(tooltips=[("OHP", "@o_tv{1} : @ohp_total_vol{1}")], names=["o_tv"],mode='vline'), PanTool(dimensions='width'), wz_tv, ResetTool(), SaveTool()]
 
 	data['date_str'] = data['date'].map(str)
 

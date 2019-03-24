@@ -36,8 +36,8 @@ def diet():
 def weightlifting():
     q = Lifts.query.filter(Lifts.date != None)
     data = pd.read_sql(q.statement, q.session.bind)
-    script, div_max, div_max_vol_per_set, div_total_vol, plot_max_div, plot_mvps_div, plot_tv_div = graph_weightlifting.weightlifting_graph(data)
-    return render_template("weightlifting.html",data=data, script=script, div_max=div_max, div_max_vol_per_set=div_max_vol_per_set, div_total_vol=div_total_vol, plot_max_div=plot_max_div, plot_mvps_div=plot_mvps_div, plot_tv_div=plot_tv_div, title="WEIGHTLIFTING")
+    script, div_max, div_max_vol_per_set, div_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div = graph_weightlifting.weightlifting_graph(data)
+    return render_template("weightlifting.html",data=data, script=script, div_max=div_max, div_max_vol_per_set=div_max_vol_per_set, div_total_vol=div_total_vol, plot_max_div=plot_max_div, plot_mvps_div=plot_mvps_div, plot_tv_div=plot_tv_div, ma_slider_div=ma_slider_div, title="WEIGHTLIFTING")
 
 @app.route("/books")
 def books():

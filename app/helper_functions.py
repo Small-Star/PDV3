@@ -302,10 +302,23 @@ div_avg_bf.change.emit();
 LIFTS_STATS_CODE = ("""
 
 var s_d = s.data
-var w_d = w.data
 
-var w_d = Object.assign({},s.data)
+var culled_vals = Object.assign({},s.data)
 
+var div_squat_max = d_s_m;
+var div_deadlift_max = d_d_m;
+var div_bench_max = d_b_m;
+var div_ohp_max = d_o_m;
+
+var div_squat_max_vol_per_set = d_s_mvps;
+var div_deadlift_max_vol_per_set = d_d_mvps;
+var div_bench_max_vol_per_set = d_b_mvps;
+var div_ohp_max_vol_per_set = d_o_mvps;
+
+var div_squat_total_vol = d_s_tv;
+var div_deadlift_total_vol = d_d_tv;
+var div_bench_total_vol = d_b_tv;
+var div_ohp_total_vol = d_o_tv;
 
 //Beginning and end of currently selected x_range
 var end = new Date(Number(cb_obj.end.toString()));
@@ -314,7 +327,7 @@ var beg = new Date(Number(cb_obj.start.toString()));
 //Clear values
 cn = s.column_names
 for (h = 0; h < cn.length; h++) {
-    w_d[cn[h]] = []
+    culled_vals[cn[h]] = []
     }
 
 //Read in values of the dates in the currently selected x_range
@@ -322,7 +335,9 @@ for (h = 0; h < cn.length; h++) {
 for (i = 0; i < s_d['date'].length; i++) {
     if(s_d['date'][i] >= beg && s_d['date'][i] <= end){
         for (j = 0; j < cn.length; j++) {
-                w_d[cn[j]].push(Math.max(s_d[cn[j]][i],w_d[cn[j]][i-1],1000))
+               if (!isNaN(s_d[cn[j]][i])){
+                culled_vals[cn[j]].push(s_d[cn[j]][i])
+            }             
         }
     }
 }
@@ -335,8 +350,49 @@ var s = 0
     return s
 }
 
+function array_max(a){
+var s = 0
+    for (h = 0; h < a.length; h++) {
+        if (a[h] > s){
+            s = a[h]
+        }
+    }
+    return s
+}
+
+
 function array_avg(a){
     return array_sum(a)/a.length
 }
+
+div_squat_max.text = array_max(culled_vals['squat_max']).toFixed(0).toString();
+div_deadlift_max.text = array_max(culled_vals['deadlift_max']).toFixed(0).toString();
+div_bench_max.text = array_max(culled_vals['bench_max']).toFixed(0).toString();
+div_ohp_max.text = array_max(culled_vals['ohp_max']).toFixed(0).toString();
+
+div_squat_max_vol_per_set.text = array_max(culled_vals['squat_max_vol_per_set']).toFixed(0).toString();
+div_deadlift_max_vol_per_set.text = array_max(culled_vals['deadlift_max_vol_per_set']).toFixed(0).toString();
+div_bench_max_vol_per_set.text = array_max(culled_vals['bench_max_vol_per_set']).toFixed(0).toString();
+div_ohp_max_vol_per_set.text = array_max(culled_vals['ohp_max_vol_per_set']).toFixed(0).toString();
+
+div_squat_total_vol.text = array_sum(culled_vals['squat_total_vol']).toFixed(0).toString();
+div_deadlift_total_vol.text = array_sum(culled_vals['deadlift_total_vol']).toFixed(0).toString();
+div_bench_total_vol.text = array_sum(culled_vals['bench_total_vol']).toFixed(0).toString();
+div_ohp_total_vol.text = array_sum(culled_vals['ohp_total_vol']).toFixed(0).toString();
+
+div_squat_max.change.emit();
+div_deadlift_max.change.emit();
+div_bench_max.change.emit();
+div_ohp_max.change.emit();
+
+div_squat_max_vol_per_set.change.emit();
+div_deadlift_max_vol_per_set.change.emit();
+div_bench_max_vol_per_set.change.emit();
+div_ohp_max_vol_per_set.change.emit();
+
+div_squat_total_vol.change.emit();
+div_deadlift_total_vol.change.emit();
+div_bench_total_vol.change.emit();
+div_ohp_total_vol.change.emit();
 
 """)

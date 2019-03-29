@@ -166,6 +166,9 @@ class Lifts(db.Model):
     ohp_max_vol_per_set = db.Column(db.Integer)
     ohp_total_vol = db.Column(db.Integer)
 
+    stair_amount = db.Column(db.Integer)
+    stair_time = db.Column(db.Integer)
+
     def __init__(self, date):
         self.date = date
 # class Journals(db.Model):

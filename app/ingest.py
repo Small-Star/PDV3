@@ -614,6 +614,23 @@ def ingest_weightlifting(date=""):
                     l.ohp_max_vol_per_set = o_max_vol_per_set
                     db.session.merge(l)
 
+                if d[1].strip() == "Stair Stepper":
+
+                    #If entry does not exist, create it
+                    if Lifts.query.get(self.date) == None:
+                        l = Lifts(self.date)
+                        db.session.merge(l)
+
+                    #Add entry
+                    l = Lifts.query.get(self.date)
+
+                    #Check if this is a new format
+                    if re.search(";", d[2]):
+                        l.stair_amount = int(d[2].split("steps")[0].strip())
+                        l.stair_time = int(d[2].split(";")[1].strip("min").strip())
+                    db.session.merge(l)
+
+
         def get_lifts(self):
             self.to_add.append(WL_Tup(date=self.date, start_time=self.start_time, end_time=self.end_time, weight=self.weight, bodyfat=self.bodyfat, wo_rating=self.wo_rating, wo_designation=self.wo_designation, wo_notes=self.wo_notes))
             return self.to_add[1:]
@@ -670,13 +687,13 @@ def ingest_weightlifting(date=""):
 
     db.session.commit()
 
-    test = db.session.query(Lifts).all()
-    [print(_.date, _.squat_str, _.squat_max, _.squat_max_vol_per_set, _.squat_total_vol) for _ in test if _.squat_str != None] #if _.date > datetime.date(2017,4,10)]
+    #test = db.session.query(Lifts).all()
+    #[print(_.date, _.squat_str, _.squat_max, _.squat_max_vol_per_set, _.squat_total_vol) for _ in test if _.squat_str != None] #if _.date > datetime.date(2017,4,10)]
     
-    print("Squat Total Vol: ", sum([_.squat_total_vol for _ in test if _.squat_str != None]))
-    print("Squat Max Max Vol per Set: ", max([_.squat_max_vol_per_set for _ in test if _.squat_str != None]))
-    print("Squat Max Max: ", max([_.squat_max for _ in test if _.squat_str != None]))
-    db.session.commit()
+    #print("Squat Total Vol: ", sum([_.squat_total_vol for _ in test if _.squat_str != None]))
+    #print("Squat Max Max Vol per Set: ", max([_.squat_max_vol_per_set for _ in test if _.squat_str != None]))
+    #print("Squat Max Max: ", max([_.squat_max for _ in test if _.squat_str != None]))
+    #db.session.commit()
 
     logging.info("Ingested %s Weightlifting records; Validated %s Weightlifting records; Added %s Weightlifting records", str(len(t_a)), str(len(t_a_)), str(ad))
     print("Weightlifting Ingest complete")

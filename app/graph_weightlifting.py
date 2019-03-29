@@ -15,8 +15,8 @@ from helper_functions import *
 
 def weightlifting_graph(data):
 	'''Weightlifting graphs'''
-	script_div, (div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div) = weightlifting_figs(data)
-	return script_div, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div
+	script_div, (div_stairs, div_num_ohp, div_workouts, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div) = weightlifting_figs(data)
+	return script_div, div_stairs, div_num_ohp, div_workouts, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div
 
 
 def weightlifting_figs(data, height = 500, width = 1200):
@@ -42,11 +42,11 @@ def weightlifting_figs(data, height = 500, width = 1200):
 
 	data['date_str'] = data['date'].map(str)
 
-	cds_max = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], squat_max=data['squat_max'], deadlift_max=data['deadlift_max'], bench_max=data['bench_max'], ohp_max=data['ohp_max']))
+	cds_max = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], stair_amount=data['stair_amount'], squat_max=data['squat_max'], deadlift_max=data['deadlift_max'], bench_max=data['bench_max'], ohp_max=data['ohp_max']))
 
 	#MVPS and TV plots are hooked into the MA slider, so share a cds
-	cds_w = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], squat_max=data['squat_max'], deadlift_max=data['deadlift_max'], bench_max=data['bench_max'], ohp_max=data['ohp_max'], squat_max_vol_per_set=data['squat_max_vol_per_set'], deadlift_max_vol_per_set=data['deadlift_max_vol_per_set'], bench_max_vol_per_set=data['bench_max_vol_per_set'], ohp_max_vol_per_set=data['ohp_max_vol_per_set'], squat_total_vol=data['squat_total_vol'], deadlift_total_vol=data['deadlift_total_vol'], bench_total_vol=data['bench_total_vol'], ohp_total_vol=data['ohp_total_vol']))
-	cds_s = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], squat_max=data['squat_max'], deadlift_max=data['deadlift_max'], bench_max=data['bench_max'], ohp_max=data['ohp_max'], squat_max_vol_per_set=data['squat_max_vol_per_set'], deadlift_max_vol_per_set=data['deadlift_max_vol_per_set'], bench_max_vol_per_set=data['bench_max_vol_per_set'], ohp_max_vol_per_set=data['ohp_max_vol_per_set'], squat_total_vol=data['squat_total_vol'], deadlift_total_vol=data['deadlift_total_vol'], bench_total_vol=data['bench_total_vol'], ohp_total_vol=data['ohp_total_vol']))
+	cds_w = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], stair_amount=data['stair_amount'], squat_max=data['squat_max'], deadlift_max=data['deadlift_max'], bench_max=data['bench_max'], ohp_max=data['ohp_max'], squat_max_vol_per_set=data['squat_max_vol_per_set'], deadlift_max_vol_per_set=data['deadlift_max_vol_per_set'], bench_max_vol_per_set=data['bench_max_vol_per_set'], ohp_max_vol_per_set=data['ohp_max_vol_per_set'], squat_total_vol=data['squat_total_vol'], deadlift_total_vol=data['deadlift_total_vol'], bench_total_vol=data['bench_total_vol'], ohp_total_vol=data['ohp_total_vol']))
+	cds_s = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], stair_amount=data['stair_amount'], squat_max=data['squat_max'], deadlift_max=data['deadlift_max'], bench_max=data['bench_max'], ohp_max=data['ohp_max'], squat_max_vol_per_set=data['squat_max_vol_per_set'], deadlift_max_vol_per_set=data['deadlift_max_vol_per_set'], bench_max_vol_per_set=data['bench_max_vol_per_set'], ohp_max_vol_per_set=data['ohp_max_vol_per_set'], squat_total_vol=data['squat_total_vol'], deadlift_total_vol=data['deadlift_total_vol'], bench_total_vol=data['bench_total_vol'], ohp_total_vol=data['ohp_total_vol']))
 
 	d = cds_max.data
 	d_w = cds_w.data
@@ -240,9 +240,19 @@ def weightlifting_figs(data, height = 500, width = 1200):
 	div_bench_total_vol = Div()
 	div_ohp_total_vol = Div()
 
+	num_stairs = sum([_ for _ in data['stair_amount'] if math.isnan(_)==False])
+	num_esb = num_stairs/1860
+
+	div_stairs = Div(text=str(int(num_stairs)) + " (" + str(int(num_esb)) + " Empire State Bldg)")
+	#(sum(data['squat_total_vol']) + sum(data['deadlift_total_vol']) + sum(data['bench_total_vol']) + sum(data['ohp_total_vol']))
+	num_ohp = (sum([_ for _ in data['squat_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['deadlift_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['bench_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['ohp_total_vol'] if math.isnan(_)==False]))/8200000
+	div_num_ohp = Div(text=str('{0:.2f}'.format(num_ohp)))
+	div_workouts = Div(text=str(len(data['date'])))
+
+
 	ma_cb = CustomJS(args=dict(w=cds_w, s=cds_s), code=MA_SLIDER_CODE)
 	#plot_mvps.x_range.callback = CustomJS(args=dict(s=cds_s), code=LIFTS_STATS_CODE
 	plot_max.x_range.callback = CustomJS(args=dict(d_s_m=div_squat_max, d_d_m=div_deadlift_max, d_b_m=div_bench_max, d_o_m=div_ohp_max, d_s_mvps=div_squat_max_vol_per_set, d_d_mvps=div_deadlift_max_vol_per_set, d_b_mvps=div_bench_max_vol_per_set, d_o_mvps=div_ohp_max_vol_per_set, d_s_tv=div_squat_total_vol, d_d_tv=div_deadlift_total_vol, d_b_tv=div_bench_total_vol, d_o_tv=div_ohp_total_vol, s=cds_s), code=LIFTS_STATS_CODE)
 
 	ma_slider = Slider(start=1, end=30, value=1, step=1, title="Moving Average", callback=ma_cb)
-	return components((div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max, plot_mvps, plot_tv, ma_slider))
+	return components((div_stairs, div_num_ohp, div_workouts, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max, plot_mvps, plot_tv, ma_slider))

@@ -39,6 +39,11 @@ def weightlifting():
     script, div_stairs, div_num_ohp, div_workouts, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div = graph_weightlifting.weightlifting_graph(data)
     return render_template("weightlifting.html",data=data, script=script, div_stairs=div_stairs, div_num_ohp=div_num_ohp, div_workouts=div_workouts, div_squat_max=div_squat_max, div_deadlift_max=div_deadlift_max, div_bench_max=div_bench_max, div_ohp_max=div_ohp_max, div_squat_max_vol_per_set=div_squat_max_vol_per_set, div_deadlift_max_vol_per_set=div_deadlift_max_vol_per_set, div_bench_max_vol_per_set=div_bench_max_vol_per_set, div_ohp_max_vol_per_set=div_ohp_max_vol_per_set, div_squat_total_vol=div_squat_total_vol, div_deadlift_total_vol=div_deadlift_total_vol, div_bench_total_vol=div_bench_total_vol, div_ohp_total_vol=div_ohp_total_vol,  plot_max_div=plot_max_div, plot_mvps_div=plot_mvps_div, plot_tv_div=plot_tv_div, ma_slider_div=ma_slider_div, title="WEIGHTLIFTING")
 
+@app.route("/meditation")
+def meditation():
+    title = "Meditation"
+    return render_template("meditation.html",title=title)
+
 @app.route("/books")
 def books():
     title = "Books"

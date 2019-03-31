@@ -55,6 +55,10 @@ class QS_Params(db.Model):
     wo_designation = db.Column(db.String(length=10))
     wo_notes = db.Column(db.String(length=255))
 
+    #Meditation
+    meditation_time = db.Column(db.Integer)
+    num_sits = db.Column(db.Integer)
+
     # f = open(os.path.join(app.config["LL_FILE"]), 'r')
     # lift1 = f.readline()
     # lift2 = f.readline()

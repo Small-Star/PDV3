@@ -13,7 +13,7 @@ Rhr_Tup = namedtuple('Rhr_Tup', 'date rhr_time bpm')
 Sleep_Tup = namedtuple('Sleep_Tup', 'date sleep_onset sleep_duration sleep_how_much_more sleep_how_deep sleep_interruptions sleep_overall_q sleep_notes')
 Blood_Tup = namedtuple('Blood_Tup', 'date glucose_time glucose ketones_time ketones blood_notes')
 WL_Tup = namedtuple('WL_Tup', 'date start_time end_time weight bodyfat wo_rating wo_designation wo_notes')
-
+M_Tup = namedtuple('M_Tup', 'date meditation_time')
 
 def ingest_mood(date=""):
     '''Reads data from MOOD_FILE and inputs it into db'''
@@ -697,3 +697,91 @@ def ingest_weightlifting(date=""):
 
     logging.info("Ingested %s Weightlifting records; Validated %s Weightlifting records; Added %s Weightlifting records", str(len(t_a)), str(len(t_a_)), str(ad))
     print("Weightlifting Ingest complete")
+
+def ingest_meditation(date=""):
+    '''Reads data from MEDITATION_FILE and inputs it into db'''
+
+    class Meditation_HTML_Parser(HTMLParser):
+        ''' Input an xml file, return a list of tuples to add to the db'''
+        def __init__(self):
+            HTMLParser.__init__(self)
+
+            self.to_add = [] #List of tuples that will be returned for adding to the db
+            self.date, self.meditation_time = datetime.date(2100,1,1), 0
+
+            #self.date_re = re.compile(r'\d\d\/\d\d\/\d\d\d\d')      #ex: '03/22/2014'
+            self.sit_re = re.compile(r'\d\d\/\d\d\/\d\d\d\d - \d* min - \d\d:\d\d')
+
+        def handle_data(self, data):
+            #Line by line parsing of input data
+            data_ = data.strip()    #Drop whitespace
+            if re.match(self.sit_re,data_) != None:
+                self.to_add.append(M_Tup(date=self.date, meditation_time=self.meditation_time))
+                self.date, self.meditation_time = datetime.date(2100,1,1), 0
+                self.date = datetime.datetime.strptime(data_[:10],"%m/%d/%Y").date()
+                self.meditation_time = int(re.match(r'[0-9]*',data_.split("-")[1].strip()).group(0))
+
+        def get_meditations(self):
+            self.to_add.append(M_Tup(date=self.date, meditation_time=self.meditation_time))
+            return self.to_add[1:]
+
+    #Validate
+    def val_meditation_params(mt):
+        try:
+            assert type(mt.date)==datetime.date and mt.date >= datetime.date(2013,12,29), "date"
+            if mt.meditation_time != 0:
+                assert type(mt.meditation_time)==int, "meditation_time"
+                assert mt.meditation_time > 1 and mt.meditation_time < 900, "meditation_time"
+            return mt
+        except Exception as e:
+            logging.warning("Validation error in Meditation ingest for date " + str(mt.date) + ": " + e.args[0])
+            return M_Tup(date=datetime.date(2100,1,1), meditation_time=0)
+
+    Meditation_Parser = Meditation_HTML_Parser()
+    f_name = open(os.path.join(app.config["BASE_FDIR"], app.config["MEDITATION_FILE"]), 'r')
+
+    #Read data
+    Meditation_Parser.feed(f_name.read())
+    t_a = Meditation_Parser.get_meditations()
+    #print("Days read: " + str(len(t_a)))
+    t_a_ = [val_meditation_params(t) for t in t_a]
+    #print("Days passing validation: " + str(len(t_a_)))
+
+    ad = 0
+
+    #Clear out existing entries--not the most efficient way to deal with the problem of adding multiple entries, but it works
+    for _ in t_a_:
+        if QS_Params.query.get(_.date) == None:
+            q = QS_Params(_.date)
+            db.session.merge(q)
+
+        q = QS_Params.query.get(_.date)
+        q.meditation_time = 0
+        q.num_sits = 0
+        db.session.merge(q)
+
+    #Try and add entry to db
+    for _ in t_a_:
+        q = QS_Params.query.get(_.date)
+        if q.meditation_time == None:
+            q.meditation_time = _.meditation_time
+        else:
+            q.meditation_time += _.meditation_time
+        if q.num_sits == None:
+            q.num_sits = 1
+        else:
+            q.num_sits += 1
+
+        db.session.merge(q)
+
+        ad += 1
+
+    db.session.commit()
+
+    #test = db.session.query(QS_Params).all()
+    #[print(_.date, _.meditation_time, _.num_sits) for _ in test if _.meditation_time != None] #if _.date > datetime.date(2017,4,10)]
+    
+    #print("Amount Meditated: ", sum([_.meditation_time for _ in test if _.meditation_time != None]))
+
+    logging.info("Ingested %s Meditation records; Validated %s Meditation records; Added %s Meditation records", str(len(t_a)), str(len(t_a_)), str(ad))
+    print("Meditation Ingest complete")

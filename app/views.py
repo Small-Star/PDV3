@@ -3,7 +3,7 @@ from app import app, db
 from app.models import Mood, QS_Params, Lifts
 import pandas as pd
 
-import graph_mood, graph_diet, graph_body, graph_weightlifting
+import graph_mood, graph_diet, graph_body, graph_weightlifting, graph_meditation
 
 @app.route("/")
 @app.route("/index")
@@ -41,8 +41,10 @@ def weightlifting():
 
 @app.route("/meditation")
 def meditation():
-    title = "Meditation"
-    return render_template("meditation.html",title=title)
+    q = QS_Params.query.filter(QS_Params.meditation_time >= 0)
+    data = pd.read_sql(q.statement, q.session.bind)
+    script, plot_daily_div, plot_cumu_div = graph_meditation.meditation_graph(data)
+    return render_template("meditation.html",data=data, script=script, plot_daily_div=plot_daily_div, plot_cumu_div=plot_cumu_div, title="MEDITATION")
 
 @app.route("/books")
 def books():

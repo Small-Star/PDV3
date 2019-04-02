@@ -83,6 +83,7 @@ class QS_Params(db.Model):
 
     def __init__(self, date):
         self.date = date
+        self.meditation_time = 0
 
     def __repr__(self):
         return str(self.date) + ": " + str(self.kcal_intake)

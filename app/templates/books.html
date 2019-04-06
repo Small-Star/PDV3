@@ -1,8 +1,75 @@
-{% extends "base.html" %}
-{% block main_ctnt %}
-    <h1>Books</h1>
+{% extends "base_no_infobar.html" %}
+{% block head_ctnt %}
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+<link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.css"
+    rel="stylesheet" type="text/css">
+
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.6.min.js"></script>
+
+  {{ script|safe }}
 {% endblock %}
 
-{% block info_bar_ctnt %}
-    <h3>INFORMATION</h3>
+{% block main_ctnt %}
+            
+            <!-- MAIN CONTENT -->
+
+			<div class="panel panel-primary">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">BOOKS: OCT 2014 - DEC 2014</h3>
+			    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_2014">
+			  </div>
+			  <div id="pan_2014" class="panel-body panel-collapse collapse in">
+				<img src= "/static/images/2014_books_collage.jpg" width="1500" alt="2014 Books" class="center">
+				
+			  </div>
+			</div>
+
+			<div class="panel panel-primary">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">BOOKS: 2015</h3>
+			    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_2015">
+			  </div>
+			  <div id="pan_2015" class="panel-body panel-collapse collapse in">
+				<img src= "/static/images/2015_books_collage.jpg" width="1500" alt="2015 Books" class="center">
+				
+			  </div>
+			</div>
+
+			<div class="panel panel-primary">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">BOOKS: 2016</h3>
+			    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_2016">
+			  </div>
+			  <div id="pan_2016" class="panel-body panel-collapse collapse in">
+				<img src= "/static/images/2016_books_collage.jpg" width="1500" alt="2016 Books" class="center">
+				
+			  </div>
+			</div>
+          
+          	<div class="panel panel-primary">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">BOOKS: 2017</h3>
+			    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_2017">
+			  </div>
+			  <div id="pan_2017" class="panel-body panel-collapse collapse in">
+				<img src= "/static/images/2017_books_collage.jpg" width="1500" alt="2017 Books" class="center">
+				
+			  </div>
+			</div>
+
+			<div class="panel panel-primary">
+			  <div class="panel-heading">
+			    <h3 class="panel-title">BOOKS: 2018</h3>
+			    <button type="button" class="panel-toggle pull-right" data-toggle="collapse" data-target="#pan_2018">
+			  </div>
+			  <div id="pan_2018" class="panel-body panel-collapse collapse in">
+				<img src= "/static/images/2018_books_collage.jpg" width="1500" alt="2018 Books" class="center">
+				
+			  </div>
+			</div>
+
 {% endblock %}

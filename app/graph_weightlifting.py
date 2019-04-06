@@ -203,16 +203,16 @@ def weightlifting_figs(data, height = 500, width = 1200):
 	
 	plot_tv.add_tools(plot_tv_tools_s[0], plot_tv_tools_b[0] ,plot_tv_tools_o[0])
 	
-	plot_tv.cross('date', 'squat_total_vol', source=cds_w, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Squat")
+	plot_tv.cross('date', 'squat_total_vol', source=cds_s, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Squat")
 	plot_tv.line('date', 's_tv', name='s_tv', source=cds_w, line_color="#8B0A50", line_width=1, line_alpha=0.6, legend="Squat (MA)")
 
-	plot_tv.cross('date', 'deadlift_total_vol', source=cds_w, line_color="#333366", line_width=1, line_alpha=0.6, legend="Deadlift")
+	plot_tv.cross('date', 'deadlift_total_vol', source=cds_s, line_color="#333366", line_width=1, line_alpha=0.6, legend="Deadlift")
 	plot_tv.line('date', 'd_tv', name='d_tv', source=cds_w, line_color="#333366", line_width=1, line_alpha=0.6, legend="Deadlift (MA)")
 
-	plot_tv.cross('date', 'bench_total_vol', source=cds_w, line_color="#FF7700", line_width=1, line_alpha=0.6, legend="Bench Press")
+	plot_tv.cross('date', 'bench_total_vol', source=cds_s, line_color="#FF7700", line_width=1, line_alpha=0.6, legend="Bench Press")
 	plot_tv.line('date', 'b_tv', name='b_tv', source=cds_w, line_color="#FF7700", line_width=1, line_alpha=0.6, legend="Bench Press (MA)")
 
-	plot_tv.cross('date', 'ohp_total_vol', source=cds_w, line_color="#C74D56", line_width=1, line_alpha=0.6, legend="Overhead Press")
+	plot_tv.cross('date', 'ohp_total_vol', source=cds_s, line_color="#C74D56", line_width=1, line_alpha=0.6, legend="Overhead Press")
 	plot_tv.line('date', 'o_tv', name='o_tv', source=cds_w, line_color="#C74D56", line_width=1, line_alpha=0.6, legend="Overhead Press (MA)")
 
 	plot_tv.yaxis.axis_label = "lbs"

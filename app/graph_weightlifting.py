@@ -15,8 +15,8 @@ from helper_functions import *
 
 def weightlifting_graph(data):
 	'''Weightlifting graphs'''
-	script_div, (div_stairs, div_num_ohp, div_workouts, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div) = weightlifting_figs(data)
-	return script_div, div_stairs, div_num_ohp, div_workouts, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div
+	script_div, (div_stairs, div_num_ohp, div_workouts, div_wilks, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div) = weightlifting_figs(data)
+	return script_div, div_stairs, div_num_ohp, div_workouts, div_wilks, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div
 
 
 def weightlifting_figs(data, height = 500, width = 1200):
@@ -89,7 +89,7 @@ def weightlifting_figs(data, height = 500, width = 1200):
 		else:
 			o_m.append(max(o_m[c - 1],d['ohp_max'][c]))
 
-		#Extend
+		#Extend for vlaues that are not present
 		if math.isnan(d_w['squat_max_vol_per_set'][c]):
 			s_mvps.append(s_mvps[c - 1])
 		else:
@@ -124,6 +124,7 @@ def weightlifting_figs(data, height = 500, width = 1200):
 		else:
 			o_tv.append(d_w['ohp_total_vol'][c])
 
+	#Put the calculated data into the CDS
 	cds_max.add(d['date'], name='date')
 	cds_max.add(s_m, name='s_m')
 	cds_max.add(d_m, name='d_m')
@@ -152,17 +153,11 @@ def weightlifting_figs(data, height = 500, width = 1200):
 	cds_s.add(b_tv, name='b_tv')
 	cds_s.add(o_tv, name='o_tv')
 
+	#Plot: MAXes
 	plot_max = figure(x_axis_type="datetime", title="MAXes", h_symmetry=False, v_symmetry=False,
 				  min_border=0, plot_height=height, plot_width=width, toolbar_location="above", outline_line_color="#666666", active_scroll=wz_max,tools=plot_max_tools_d)
 	
 	plot_max.yaxis.axis_label = "lbs"
-
-	#sr = plot_max.circle('date', 'squat_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
-	#dr = plot_max.circle('date', 'deadlift_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
-	#br = plot_max.circle('date', 'bench_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
-	#ohpr = plot_max.circle('date', 'ohp_max', source=cds_max, size=10, fill_color="grey", hover_fill_color="firebrick", fill_alpha=0.00, hover_alpha=0.3, line_color=None, hover_line_color="white")
-
-	#plot_max.add_tools(HoverTool(tooltips=None, renderers=[sr, dr, br, ohpr], mode='vline'))
 	plot_max.add_tools(plot_max_tools_s[0], plot_max_tools_b[0] ,plot_max_tools_o[0])
 
 	plot_max.line('date', 's_m', source=cds_max, name='squat_clamp', line_color="#8B0A50", line_width=2, line_alpha=0.6, legend="Squat (Clamp)")
@@ -180,7 +175,7 @@ def weightlifting_figs(data, height = 500, width = 1200):
 	plot_max.legend.location = "top_left"
 	plot_max.legend.click_policy="hide"
 
-	#MVPS
+	#Plot: MVPS
 	plot_mvps = figure(x_axis_type="datetime", title="Maximum Volume Per Set", h_symmetry=False, v_symmetry=False,
 				  min_border=0, plot_height=height, plot_width=width, x_range=plot_max.x_range, toolbar_location="above", outline_line_color="#666666", tools=plot_mvps_tools_d, active_scroll=wz_mvps)
 
@@ -198,8 +193,7 @@ def weightlifting_figs(data, height = 500, width = 1200):
 	plot_mvps.cross('date', 'ohp_max_vol_per_set', source=cds_s, line_color="#C74D56", line_width=1, line_alpha=0.6, legend="Overhead Press")
 	plot_mvps.line('date', 'o_mvps', name="o_mvps", source=cds_w, line_color="#C74D56", line_width=1, line_alpha=0.6, legend="Overhead Press (MA)")
 				
-	#glyph = X(x='date', y='squat_max_vol_per_set', line_color="#8B0A50", line_width=1, line_alpha=0.6)
-	#plot_mvps.add_glyph(cds_mvps, glyph)
+	#Plot: Total Volume
 	plot_mvps.yaxis.axis_label = "lbs"
 	plot_mvps.legend.location = "top_left"
 	plot_mvps.legend.click_policy="hide"
@@ -240,19 +234,27 @@ def weightlifting_figs(data, height = 500, width = 1200):
 	div_bench_total_vol = Div()
 	div_ohp_total_vol = Div()
 
+	#Calculate number of stairs climbed on stairmaster
 	num_stairs = sum([_ for _ in data['stair_amount'] if math.isnan(_)==False])
-	num_esb = num_stairs/1860
-
+	num_esb = num_stairs/1860 #1860 steps in the Empire State Building
 	div_stairs = Div(text=str(int(num_stairs)) + " (" + str(int(num_esb)) + " Empire State Bldg)")
-	#(sum(data['squat_total_vol']) + sum(data['deadlift_total_vol']) + sum(data['bench_total_vol']) + sum(data['ohp_total_vol']))
+
+	#Calculate number of missile frigates lifted
 	num_ohp = (sum([_ for _ in data['squat_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['deadlift_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['bench_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['ohp_total_vol'] if math.isnan(_)==False]))/8200000
 	div_num_ohp = Div(text=str('{0:.2f}'.format(num_ohp)))
 	div_workouts = Div(text=str(len(data['date'])))
 
+	#Calculate Wilks
+	#TODO: Pull in actual weight
+	bw = 150/2.2
+	totals = s_m[-1]/2.2 + d_m[-1]/2.2 + b_m[-1]/2.2
+
+	#Static constant
+	wilks_c = 500/(-216.0475144 + (16.2606339)*bw + (-0.002388645)*bw**2 + (-0.00113732)*bw**3 + (0.000007019)*bw**4 + (-0.00000001291)*bw**5) 
+	div_wilks = Div(text=str('{0:.2f}'.format(wilks_c*totals)))
 
 	ma_cb = CustomJS(args=dict(w=cds_w, s=cds_s), code=MA_SLIDER_CODE)
-	#plot_mvps.x_range.callback = CustomJS(args=dict(s=cds_s), code=LIFTS_STATS_CODE
 	plot_max.x_range.callback = CustomJS(args=dict(d_s_m=div_squat_max, d_d_m=div_deadlift_max, d_b_m=div_bench_max, d_o_m=div_ohp_max, d_s_mvps=div_squat_max_vol_per_set, d_d_mvps=div_deadlift_max_vol_per_set, d_b_mvps=div_bench_max_vol_per_set, d_o_mvps=div_ohp_max_vol_per_set, d_s_tv=div_squat_total_vol, d_d_tv=div_deadlift_total_vol, d_b_tv=div_bench_total_vol, d_o_tv=div_ohp_total_vol, s=cds_s), code=LIFTS_STATS_CODE)
 
 	ma_slider = Slider(start=1, end=30, value=1, step=1, title="Moving Average", callback=ma_cb)
-	return components((div_stairs, div_num_ohp, div_workouts, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max, plot_mvps, plot_tv, ma_slider))
+	return components((div_stairs, div_num_ohp, div_workouts, div_wilks, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max, plot_mvps, plot_tv, ma_slider))

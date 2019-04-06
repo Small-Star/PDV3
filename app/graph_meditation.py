@@ -39,8 +39,6 @@ def meditation_figs(data, height = 500, width = 1700):
 	#Calculate weeklong MA value, and cumulative value
 	m_t_ma, m_t_c = [], []
 
-	# #***TODO: FIX data artifacts
-
 	# #MA (inital values: 10;0;0;10;10;10;10)
 	m_t_ma.append(10.0)
 	m_t_ma.append(5.0)

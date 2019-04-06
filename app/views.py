@@ -51,6 +51,11 @@ def books():
     title = "Books"
     return render_template("books.html",title=title)
 
+@app.route("/goals")
+def goals():
+    title = "GOAL TRACKING"
+    return render_template("goals.html",title=title)
+
 @app.route("/finances")
 def finances():
     title = "finances"

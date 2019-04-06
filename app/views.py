@@ -41,7 +41,7 @@ def weightlifting():
 
 @app.route("/meditation")
 def meditation():
-    q = QS_Params.query.filter(QS_Params.meditation_time >= 0)
+    q = QS_Params.query.filter(QS_Params.meditation_time >= 0).order_by(QS_Params.date)
     data = pd.read_sql(q.statement, q.session.bind)
     script, plot_daily_div, plot_cumu_div = graph_meditation.meditation_graph(data)
     return render_template("meditation.html",data=data, script=script, plot_daily_div=plot_daily_div, plot_cumu_div=plot_cumu_div, title="MEDITATION")

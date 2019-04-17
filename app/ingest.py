@@ -442,10 +442,19 @@ def ingest_weightlifting(date=""):
 
         def handle_data(self, data_):
             data = data_.strip()
+
+            #Used for trimming strings of failed lifts
+            def dec_func(match):
+                d_s = re.sub('[IF]', '', match.group())
+                #print(d_s, str(max(int(d_s) - 1,0)))
+                return str(max(int(d_s) - 1,0))
+
             if re.match(self.date_str_re,data) != None:
                 self.to_add.append(WL_Tup(date=self.date, start_time=self.start_time, end_time=self.end_time, weight=self.weight, bodyfat=self.bodyfat, wo_rating=self.wo_rating, wo_designation=self.wo_designation, wo_notes=self.wo_notes))
                 self.date, self.start_time, self.end_time, self.weight, self.bodyfat, self.wo_rating, self.wo_designation, self.wo_notes = datetime.date(2100,1,1), None, None, None, None, "", "", ""
                 self.date = datetime.date(int(data[-5:-1]),int(data[:2]),int(data[3:5]))
+
+
                 #***STOPPED HERE***
             # elif re.match(self.start_time_re,data) != None:
             #     st_time = datetime.datetime(self.cr_date.year,self.cr_date.month,self.cr_date.day,int(data[13:15]),int(data[16:]))
@@ -491,11 +500,15 @@ def ingest_weightlifting(date=""):
                     #Add squat entry
                     l = Lifts.query.get(self.date)
 
+                    if re.search("F", d[2]) != None:
+                        p = re.compile(r'\d*F')
+                        p.sub(dec_func, d[2])
+
                     ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
 
                     for el in ss.strip().split(', '):
 
-                        if int(el.split('x')[0]) > s_max:
+                        if (int(el.split('x')[0]) > s_max) and (int(el.split('x')[1]) > 0):
                             s_max = int(el.split('x')[0])
                         if len(el.split('x')) == 2: #This is not a multi-set lift
                             int_vol = int(el.split('x')[0])*int(el.split('x')[1])
@@ -526,11 +539,15 @@ def ingest_weightlifting(date=""):
                     #Add squat entry
                     l = Lifts.query.get(self.date)
 
+                    if re.search("F", d[2]) != None:
+                        p = re.compile(r'\d*F')
+                        p.sub(dec_func, d[2])
+
                     ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
 
                     for el in ss.strip().split(', '):
 
-                        if int(el.split('x')[0]) > d_max:
+                        if (int(el.split('x')[0]) > d_max) and (int(el.split('x')[1]) > 0):
                             d_max = int(el.split('x')[0])
                         if len(el.split('x')) == 2: #This is not a multi-set lift
                             int_vol = int(el.split('x')[0])*int(el.split('x')[1])
@@ -560,11 +577,15 @@ def ingest_weightlifting(date=""):
                     #Add squat entry
                     l = Lifts.query.get(self.date)
 
+                    if re.search("F", d[2]) != None:
+                        p = re.compile(r'\d*F')
+                        p.sub(dec_func, d[2])
+
                     ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
 
                     for el in ss.strip().split(', '):
 
-                        if int(el.split('x')[0]) > b_max:
+                        if (int(el.split('x')[0]) > b_max) and (int(el.split('x')[1]) > 0):
                             b_max = int(el.split('x')[0])
                         if len(el.split('x')) == 2: #This is not a multi-set lift
                             int_vol = int(el.split('x')[0])*int(el.split('x')[1])
@@ -594,11 +615,15 @@ def ingest_weightlifting(date=""):
                     #Add squat entry
                     l = Lifts.query.get(self.date)
 
+                    if re.search("F", d[2]) != None:
+                        p = re.compile(r'\d*F')
+                        p.sub(dec_func, d[2])
+
                     ss = re.sub('[IF]', '', d[2])               #Get a clean string with no injury/failure markers
 
                     for el in ss.strip().split(', '):
 
-                        if int(el.split('x')[0]) > o_max:
+                        if (int(el.split('x')[0]) > o_max) and (int(el.split('x')[1]) > 0):
                             o_max = int(el.split('x')[0])
                         if len(el.split('x')) == 2: #This is not a multi-set lift
                             int_vol = int(el.split('x')[0])*int(el.split('x')[1])
@@ -731,7 +756,7 @@ def ingest_meditation(date=""):
             assert type(mt.date)==datetime.date and mt.date >= datetime.date(2013,12,29), "date"
             if mt.meditation_time != 0:
                 assert type(mt.meditation_time)==int, "meditation_time"
-                assert mt.meditation_time > 1 and mt.meditation_time < 900, "meditation_time"
+                assert mt.meditation_time >= 1 and mt.meditation_time < 900, "meditation_time"
             return mt
         except Exception as e:
             logging.warning("Validation error in Meditation ingest for date " + str(mt.date) + ": " + e.args[0])
@@ -778,7 +803,7 @@ def ingest_meditation(date=""):
 
     db.session.commit()
 
-    #test = db.session.query(QS_Params).all()
+    #test = db.session.query(QS_Params).order_by(QS_Params.date).all()
     #[print(_.date, _.meditation_time, _.num_sits) for _ in test if _.meditation_time != None] #if _.date > datetime.date(2017,4,10)]
     
     #print("Amount Meditated: ", sum([_.meditation_time for _ in test if _.meditation_time != None]))

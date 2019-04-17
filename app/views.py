@@ -3,7 +3,7 @@ from app import app, db
 from app.models import Mood, QS_Params, Lifts
 import pandas as pd
 
-import graph_mood, graph_diet, graph_body, graph_weightlifting, graph_meditation
+import graph_mood, graph_diet, graph_body, graph_weightlifting, graph_meditation, analysis
 
 @app.route("/")
 @app.route("/index")
@@ -48,7 +48,7 @@ def meditation():
 
 @app.route("/books")
 def books():
-    title = "Books"
+    title = "BOOKS"
     return render_template("books.html",title=title)
 
 @app.route("/goals")
@@ -65,6 +65,11 @@ def finances():
 def dayviewer():
     title = "Dayviewer"
     return render_template("dayviewer.html",title=title)
+
+@app.route("/analysis_vbe")
+def analysis_vbe():
+    title = "Regression Models: VBE"
+    return render_template("analysis_vbe.html",title=title)
 
 @app.route("/settings")
 def settings():

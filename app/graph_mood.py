@@ -82,7 +82,7 @@ def mood_figs(data, height = 500, width = 1200):
                       min_border=0, plot_height=height, plot_width=width, x_range=[1,9], y_range=[1,9], toolbar_location="above", outline_line_color="#666666", x_axis_label='Alertness', y_axis_label="Valence")
 
     #***TODO IMPROVE: Hookup slider
-    alpha_fudge, color_fudge = .1, 150
+    alpha_fudge, color_fudge = 30, 150
     cds_working_2 = ColumnDataSource(cds_working.data)
     d = cds_working_2.data
 
@@ -91,9 +91,9 @@ def mood_figs(data, height = 500, width = 1200):
         y = float((v_u + v_l)/2)
         w = (a_u - a_l)
         h = (v_u - v_l)
-        alpha = int((1 + abs(5 - a_be)**4)*alpha_fudge) #***TODO FIX: Indicate better
+        alpha = float((1 + abs(5 - a_be)**3)*alpha_fudge)/100 #***TODO FIX: Indicate better
 
-        c_val = int((1 + abs(5 - v_be)**4)*color_fudge)
+        c_val = int((1 + abs(5 - v_be)**3)*color_fudge)
 
         #Some bug in Bokeh or something; does not accept (R,G,B) tuples as colors
         if v_be >= 5:

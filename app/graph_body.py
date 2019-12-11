@@ -22,8 +22,8 @@ def body_figs(data, height=500, width=1200):
 
     #Data setup
     data['date_str'] = data['date'].map(str)
-    ma_cds_working = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], bpm=data['bpm'], sleep_overall_q=data['sleep_overall_q'], sleep_onset=data['sleep_onset'], sleep_duration=data['sleep_duration'], sleep_how_much_more=data['sleep_how_much_more'], sleep_how_deep=data['sleep_how_deep'], sleep_interruptions=data['sleep_interruptions'], glucose=data['glucose'], ketones=data['ketones'], weight=data['weight'], bodyfat=data['bodyfat']))
-    ma_cds_static = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], bpm=data['bpm'], sleep_overall_q=data['sleep_overall_q'], sleep_onset=data['sleep_onset'], sleep_duration=data['sleep_duration'], sleep_how_much_more=data['sleep_how_much_more'], sleep_how_deep=data['sleep_how_deep'], sleep_interruptions=data['sleep_interruptions'], glucose=data['glucose'], ketones=data['ketones'], weight=data['weight'], bodyfat=data['bodyfat']))
+    ma_cds_working = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], bpm=data['bpm'], hrv=data['hrv'], scaled_hrv=data['scaled_hrv'], sleep_overall_q=data['sleep_overall_q'], sleep_onset=data['sleep_onset'], sleep_duration=data['sleep_duration'], sleep_how_much_more=data['sleep_how_much_more'], sleep_how_deep=data['sleep_how_deep'], sleep_interruptions=data['sleep_interruptions'], glucose=data['glucose'], ketones=data['ketones'], weight=data['weight'], bodyfat=data['bodyfat']))
+    ma_cds_static = ColumnDataSource(dict(date=data['date'], date_str=data['date_str'], bpm=data['bpm'], hrv=data['hrv'], scaled_hrv=data['scaled_hrv'], sleep_overall_q=data['sleep_overall_q'], sleep_onset=data['sleep_onset'], sleep_duration=data['sleep_duration'], sleep_how_much_more=data['sleep_how_much_more'], sleep_how_deep=data['sleep_how_deep'], sleep_interruptions=data['sleep_interruptions'], glucose=data['glucose'], ketones=data['ketones'], weight=data['weight'], bodyfat=data['bodyfat']))
 
     #Plot tools configuration
     wz = WheelZoomTool(dimensions='width')
@@ -50,7 +50,15 @@ def body_figs(data, height=500, width=1200):
 
     #Plot Heartrate
     plot_rhr = figure(x_axis_type="datetime", title="Morning Resting HR", h_symmetry=False, v_symmetry=False, min_border=0, plot_height=int(height/2), plot_width=int(width/2),  x_range=plot_blood.x_range, outline_line_color="#666666")
-    plot_rhr.line('date', 'bpm', name="bpm", source=ma_cds_working, line_color="#8B0A50", line_width=3, line_alpha=0.6)
+    plot_rhr.line('date', 'bpm', name="bpm", source=ma_cds_working, line_color="#8B0A50", line_width=3, line_alpha=0.6, legend="BPM")
+    plot_rhr.line('date', 'hrv', name="hrv", source=ma_cds_working, line_color="#0a8b45", line_width=3, line_alpha=0.6, legend="HRV")
+    plot_rhr.line('date', 'scaled_hrv', name="scaled_hrv", source=ma_cds_working, line_color="#333366", line_width=3, line_alpha=0.6, y_range_name="scaled_hrv_range", legend="HRV (Scaled)")
+    #***TODO*** Add SNS/PNS indicator
+    plot_rhr.extra_y_ranges = {"scaled_hrv_range": Range1d(start=1, end=10)}
+    plot_rhr.add_layout(LinearAxis(y_range_name="scaled_hrv_range"), 'right')
+
+    plot_rhr.legend.location = "bottom_left"
+    plot_rhr.legend.click_policy="hide"
     plot_rhr.toolbar_location = None
 
     #Plot sleep quality (single indicator)

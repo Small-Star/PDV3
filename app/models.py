@@ -29,6 +29,9 @@ class QS_Params(db.Model):
     #RHR
     rhr_time = db.Column(db.DateTime)
     bpm = db.Column(db.Integer)
+    hrv = db.Column(db.Integer)
+    scaled_hrv = db.Column(db.Integer)
+    sp_hrv = db.Column(db.String(length=1))
 
     #Sleep
     sleep_onset = db.Column(db.DateTime)

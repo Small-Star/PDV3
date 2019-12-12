@@ -27,10 +27,8 @@
     {{ plot_blood_div|safe }}
   </div>
   <div class="col-sm-6">
-        <div class="row"> {{ plot_rhr_div|safe }}             </div>
-              <div class="row">{{ plot_osq_div|safe }}
-
-              </div>
+        <div class="row"> {{ plot_rhr_div|safe }}</div>
+        <div class="row">{{ plot_osq_div|safe }}</div>
   </div>
   </div>
   </div>
@@ -75,8 +73,9 @@
     <div class="panel-body">
       <ul class="list-group">
         <li class="list-group-item list-group-item-info text-nowrap"><b>Days:</b> {{ div_days|safe }}</li>
-        <li class="list-group-item text-nowrap"><b>Avg. Blood Glucose (mg/dl):</b> {{ div_avg_bg|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Avg. Glucose (mg/dl):</b> {{ div_avg_bg|safe }}</li>
         <li class="list-group-item text-nowrap"><b>Avg. Morning RHR (bpm):</b> {{ div_avg_rhr|safe }}</li>
+        <li class="list-group-item text-nowrap"><b>Avg. Morning HRV:</b> {{ div_avg_rhr|safe }}</li> <!--***TODO*** Incorporate HRV-->
         <li class="list-group-item text-nowrap"><b>Avg. Sleep Duration (hr):</b> {{ div_avg_slp_dur|safe }}</li>
         <li class="list-group-item text-nowrap"><b>Avg. Sleep Quality:</b> {{ div_avg_slp_q|safe }}</li>
       </ul>

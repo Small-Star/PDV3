@@ -19,7 +19,7 @@ def weightlifting_graph(data):
 	return script_div, div_stairs, div_num_ohp, div_workouts, div_wilks, div_squat_max, div_deadlift_max, div_bench_max, div_ohp_max, div_squat_max_vol_per_set, div_deadlift_max_vol_per_set, div_bench_max_vol_per_set, div_ohp_max_vol_per_set, div_squat_total_vol, div_deadlift_total_vol, div_bench_total_vol, div_ohp_total_vol, plot_max_div, plot_mvps_div, plot_tv_div, ma_slider_div
 
 
-def weightlifting_figs(data, height = 500, width = 1200):
+def weightlifting_figs(data, height = 500, width = 1000):
 	#Timeseries Plot
 	wz_max = WheelZoomTool(dimensions='width')
 	plot_max_tools_s = [HoverTool(tooltips=[("Squat", "@s_m : @squat_max")], names=["squat_clamp"],mode='vline'), PanTool(dimensions='width'), wz_max, ResetTool(), SaveTool()]
@@ -237,7 +237,7 @@ def weightlifting_figs(data, height = 500, width = 1200):
 	#Calculate number of stairs climbed on stairmaster
 	num_stairs = sum([_ for _ in data['stair_amount'] if math.isnan(_)==False])
 	num_esb = num_stairs/1860 #1860 steps in the Empire State Building
-	div_stairs = Div(text=str(int(num_stairs)) + " (" + str(int(num_esb)) + " Empire State Bldg)")
+	div_stairs = Div(text=str(int(num_stairs)) + " (" + str(int(num_esb)) + " Empire St.)")
 
 	#Calculate number of missile frigates lifted
 	num_ohp = (sum([_ for _ in data['squat_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['deadlift_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['bench_total_vol'] if math.isnan(_)==False]) + sum([_ for _ in data['ohp_total_vol'] if math.isnan(_)==False]))/8200000

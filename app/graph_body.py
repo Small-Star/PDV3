@@ -18,7 +18,7 @@ def body_graph(data):
     script_div, (div_days, div_avg_bg, div_avg_rhr, div_avg_slp_dur, div_avg_slp_q, div_days_bc, div_avg_wt, div_avg_bf, plot_blood_div, plot_rhr_div, plot_osq_div, plot_body_comp_div, plot_sleep_div, ma_slider_div) = body_figs(data)
     return script_div, div_days, div_avg_bg, div_avg_rhr, div_avg_slp_dur, div_avg_slp_q, div_days_bc, div_avg_wt, div_avg_bf, plot_blood_div, plot_rhr_div, plot_osq_div, plot_body_comp_div, plot_sleep_div, ma_slider_div
 
-def body_figs(data, height=500, width=1200):
+def body_figs(data, height=500, width=1000):
 
     #Data setup
     data['date_str'] = data['date'].map(str)

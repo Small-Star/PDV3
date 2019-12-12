@@ -20,7 +20,7 @@ def meditation_graph(data):
 	return script, plot_daily_div, plot_cumu_div
 
 
-def meditation_figs(data, height = 500, width = 1500):
+def meditation_figs(data, height = 500, width = 1300):
 	#Timeseries Plot
 	bz_daily = BoxZoomTool()
 	wz_cumu = WheelZoomTool(dimensions='width')

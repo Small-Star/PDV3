@@ -19,7 +19,7 @@ def diet_graph(data):
 
     return script_div, div_days, div_avg_intake, div_tdee, div_avg_net, div_avg_protein, div_avg_fat, div_avg_carb_all, div_avg_carb_net, div_avg_carb_fiber, div_problem_days, div_volatility, plot_comparison_div, plot_composition_div, ma_slider_div
 
-def diet_figs(data, height=500, width=1200):
+def diet_figs(data, height=500, width=1000):
 
     data['date_str'] = data['date'].map(str)
 
